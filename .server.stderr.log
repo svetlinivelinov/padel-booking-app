@@ -1,0 +1,18 @@
+::1 - - [15/Mar/2026 21:26:11] "GET / HTTP/1.1" 304 -
+::1 - - [15/Mar/2026 21:26:23] "GET /dashboard.html HTTP/1.1" 200 -
+::1 - - [15/Mar/2026 21:26:23] "GET /assets/js/env.js HTTP/1.1" 304 -
+::1 - - [15/Mar/2026 21:26:23] "GET /assets/js/groups.js HTTP/1.1" 200 -
+::1 - - [15/Mar/2026 21:26:23] "GET /assets/js/feed.js HTTP/1.1" 304 -
+::1 - - [15/Mar/2026 21:26:23] "GET /assets/js/database.js HTTP/1.1" 304 -
+::1 - - [15/Mar/2026 21:26:27] "GET /dashboard.html HTTP/1.1" 304 -
+::1 - - [15/Mar/2026 21:26:31] "GET /event.html HTTP/1.1" 304 -
+::1 - - [15/Mar/2026 21:26:31] "GET /assets/js/events.js HTTP/1.1" 200 -
+::1 - - [15/Mar/2026 21:26:45] "GET /dashboard.html HTTP/1.1" 304 -
+::1 - - [15/Mar/2026 21:26:45] "GET /assets/js/groups.js HTTP/1.1" 304 -
+::1 - - [15/Mar/2026 21:26:45] "GET /assets/js/database.js HTTP/1.1" 304 -
+::1 - - [15/Mar/2026 21:26:51] "GET /event.html HTTP/1.1" 304 -
+::1 - - [15/Mar/2026 21:26:51] "GET /assets/js/events.js HTTP/1.1" 200 -
+::1 - - [15/Mar/2026 21:27:07] "GET /assets/js/env.js HTTP/1.1" 304 -
+::1 - - [15/Mar/2026 21:27:29] "GET /assets/js/groups.js HTTP/1.1" 304 -
+::1 - - [15/Mar/2026 21:27:48] code 404, message File not found
+::1 - - [15/Mar/2026 21:27:48] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
