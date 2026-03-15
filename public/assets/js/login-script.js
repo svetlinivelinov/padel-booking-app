@@ -12,7 +12,9 @@ async function handleLogin(event) {
   status.textContent = "Signing in...";
   try {
     await signIn(email, password);
-    window.location.href = "/dashboard.html";
+    const params = new URLSearchParams(window.location.search);
+    const redirect = params.get("redirect");
+    window.location.href = redirect ? decodeURIComponent(redirect) : "/dashboard.html";
   } catch (error) {
     status.textContent = error.message;
   }

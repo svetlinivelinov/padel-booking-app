@@ -1,184 +1,255 @@
 import { requireAuth } from "./auth.js";
-import { createGroup, addGroupMember, joinGroupByToken, listMyGroups, regenerateInviteToken } from "./database.js";
+import {
+  createGroup,
+  addGroupMember,
+  joinGroupByToken,
+  listMyGroups,
+  regenerateInviteToken,
+} from "./database.js";
 
 const createForm = document.querySelector("#group-create-form");
 const joinForm = document.querySelector("#group-join-form");
 const list = document.querySelector("#group-list");
 const status = document.querySelector("#group-status");
 
+// ── Safe status helper — works even if #group-status doesn't exist on the page
+const setStatus = (msg) => { if (status) status.textContent = msg; };
+
+// ── Invite link handler ───────────────────────────────────────────────────────
+(async () => {
+  const params = new URLSearchParams(window.location.search);
+  const invite = params.get("invite");
+  if (!invite) return;
+
+  try {
+    const user = await requireAuth();
+
+    if (!user) {
+      window.location.href = `/login.html?redirect=${encodeURIComponent(
+        `/group.html?invite=${invite}`
+      )}`;
+      return;
+    }
+
+    setStatus("Joining group...");
+
+
+    const group = await joinGroupByToken(invite, user.id);
+
+    // Clean invite token from URL without reloading
+    const cleanUrl = window.location.origin + window.location.pathname;
+    window.history.replaceState({}, document.title, cleanUrl);
+
+    // Check if already a member or freshly joined
+    const groups = await listMyGroups(user.id);
+    const alreadyMember = groups.find(g => g.id === group.id);
+
+    if (alreadyMember) {
+      setStatus("You are already a member of this group. Redirecting...");
+    } else {
+      setStatus("Joined group successfully! Redirecting...");
+    }
+
+    setTimeout(() => {
+      window.location.href = `/event.html?group=${group.id}`;
+    }, 800);
+
+  } catch (err) {
+    if (err.message?.includes("duplicate") || err.code === "23505") {
+      setStatus("You are already a member of this group.");
+      setTimeout(() => refreshGroups(), 1000);
+    } else {
+      setStatus("Invalid or expired invite link.");
+    }
+  }
+})();
+
+// ── Refresh group list ────────────────────────────────────────────────────────
 export async function refreshGroups() {
   const user = await requireAuth();
+
   if (!user) {
     console.warn("Not authenticated, cannot load groups");
     const eventSelect = document.querySelector("#event-group");
     if (eventSelect) {
-      eventSelect.innerHTML = "<option value=\"\">Sign in to see groups</option>";
+      eventSelect.innerHTML = `<option value="">Sign in to see groups</option>`;
     }
     return;
   }
 
   const groups = await listMyGroups(user.id);
+
+  // ── Group list display ──
   if (list) {
     list.innerHTML = "";
+
+    if (groups.length === 0) {
+      list.innerHTML = `<p class="text-muted">You have no groups yet. Create one or join via invite link.</p>`;
+    }
+
     groups.forEach((group) => {
+      const inviteUrl = `${window.location.origin}/group.html?invite=${group.invite_token}`;
+      const isOwner = group.owner_id === user.id;
+
       const item = document.createElement("div");
       item.className = "list-card mb-2";
-      let html = `<div class='d-flex justify-content-between align-items-center'>
-        <span class='fw-semibold'>${group.name}</span>`;
-      if (group.invite_token) {
-        const inviteUrl = `${window.location.origin}/group.html?invite=${group.invite_token}`;
-        html += `<span class='ms-2 small'>Token: <code>${group.invite_token}</code></span>`;
-        html += `<button class='btn btn-sm btn-outline-secondary ms-2' data-copy-link>Copy invite link</button>`;
-        html += `<button class='btn btn-sm btn-outline-secondary ms-2' data-copy-token>Copy token</button>`;
-        if (group.owner_id === user.id) {
-          html += `<button class='btn btn-sm btn-outline-warning ms-2' data-regenerate>Regenerate token</button>`;
-        }
-      }
-      html += `</div>`;
-      item.innerHTML = html;
+      item.innerHTML = `
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <span class="fw-semibold">${group.name}</span>
+          <div class="d-flex gap-2 flex-wrap">
+            ${group.invite_token ? `
+              <button class="btn btn-sm btn-outline-secondary" data-copy-link>
+                Copy invite link
+              </button>
+              <button class="btn btn-sm btn-outline-secondary" data-copy-token>
+                Copy token
+              </button>
+            ` : ""}
+            ${isOwner ? `
+              <button class="btn btn-sm btn-outline-warning" data-regenerate>
+                Regenerate token
+              </button>
+            ` : ""}
+          </div>
+        </div>
+        ${group.invite_token ? `
+          <div class="mt-1">
+            <small class="text-muted">Token: <code>${group.invite_token}</code></small>
+          </div>
+        ` : ""}
+      `;
+
       // Copy invite link
-      const linkBtn = item.querySelector('[data-copy-link]');
-      if (linkBtn && group.invite_token) {
-        linkBtn.onclick = () => {
-          const url = `${window.location.origin}/group.html?invite=${group.invite_token}`;
-          navigator.clipboard.writeText(url);
-          linkBtn.textContent = "Copied!";
-          setTimeout(() => (linkBtn.textContent = "Copy invite link"), 1200);
-        };
-      }
+      item.querySelector("[data-copy-link]")?.addEventListener("click", async (e) => {
+        await navigator.clipboard.writeText(inviteUrl);
+        const btn = e.currentTarget;
+        if (btn) {
+          btn.textContent = "Copied!";
+          setTimeout(() => {
+            if (btn) btn.textContent = "Copy invite link";
+          }, 1500);
+        }
+      });
+
       // Copy token
-      const tokenBtn = item.querySelector('[data-copy-token]');
-      if (tokenBtn && group.invite_token) {
-        tokenBtn.onclick = () => {
-          navigator.clipboard.writeText(group.invite_token);
-          tokenBtn.textContent = "Copied!";
-          setTimeout(() => (tokenBtn.textContent = "Copy token"), 1200);
-        };
-      }
+      item.querySelector("[data-copy-token]")?.addEventListener("click", async (e) => {
+        await navigator.clipboard.writeText(group.invite_token);
+        const btn = e.currentTarget;
+        if (btn) {
+          btn.textContent = "Copied!";
+          setTimeout(() => {
+            if (btn) btn.textContent = "Copy token";
+          }, 1500);
+        }
+      });
+
       // Regenerate token (owner only)
-      const regenBtn = item.querySelector('[data-regenerate]');
-      if (regenBtn) {
-        regenBtn.onclick = async () => {
-          regenBtn.disabled = true;
-          regenBtn.textContent = "Regenerating...";
-          try {
-            await regenerateInviteToken(group.id);
-            await refreshGroups();
-          } catch (err) {
-            alert("Failed to regenerate token: " + err.message);
-          }
-        };
-      }
+      item.querySelector("[data-regenerate]")?.addEventListener("click", async (e) => {
+        const btn = e.currentTarget;
+        btn.disabled = true;
+        btn.textContent = "Regenerating...";
+        try {
+          await regenerateInviteToken(group.id);
+          await refreshGroups();
+        } catch (err) {
+          alert("Failed to regenerate token: " + err.message);
+          btn.disabled = false;
+          btn.textContent = "Regenerate token";
+        }
+      });
+
       list.appendChild(item);
     });
-// Improved: Auto-join group if invite token is in URL, then redirect to events page with group pre-selected
-document.addEventListener("DOMContentLoaded", async () => {
-  const params = new URLSearchParams(window.location.search);
-  const invite = params.get("invite");
-  if (invite) {
-    try {
-      const user = await requireAuth();
-      const group = await joinGroupByToken(invite, user.id);
-      // Wait for membership to be established, then fetch groups
-      setTimeout(async () => {
-        const groups = await listMyGroups(user.id);
-        const joined = groups.find(g => g.id === group.id);
-        if (joined) {
-          window.location.href = `/event.html?group=${group.id}`;
-        } else {
-          status.textContent = "Joined, but could not find group in your list. Try refreshing.";
-        }
-      }, 500);
-    } catch (err) {
-      if (status) status.textContent = err.message;
-    }
-  }
-});
   }
 
-  const select = document.querySelector("#group-select");
-  if (select) {
+  // ── Group select dropdowns ──
+  ["#group-select", "#event-group"].forEach((selector) => {
+    const select = document.querySelector(selector);
+    if (!select) return;
+
     select.innerHTML = "";
+
+    if (groups.length === 0) {
+      select.innerHTML = `<option value="">No groups found</option>`;
+      return;
+    }
+
     groups.forEach((group) => {
       const option = document.createElement("option");
       option.value = group.id;
       option.textContent = group.name;
       select.appendChild(option);
     });
-  }
 
-  const eventSelect = document.querySelector("#event-group");
-  if (eventSelect) {
-    eventSelect.innerHTML = "";
-    if (groups.length === 0) {
-      const option = document.createElement("option");
-      option.value = "";
-      option.textContent = "No groups found";
-      eventSelect.appendChild(option);
-    } else {
-      groups.forEach((group, idx) => {
-        const option = document.createElement("option");
-        option.value = group.id;
-        option.textContent = group.name;
-        eventSelect.appendChild(option);
-      });
-      // Auto-select first group if none selected
-      if (!eventSelect.value) {
-        eventSelect.value = groups[0].id;
-      }
-      // Trigger event list refresh
-      if (typeof window.refreshEvents === "function") {
-        window.refreshEvents();
-      }
+    if (!select.value) select.value = groups[0].id;
+
+    if (selector === "#event-group" && typeof window.refreshEvents === "function") {
+      window.refreshEvents();
     }
-  }
+  });
 }
 
-async function handleCreate(event) {
-  event.preventDefault();
+// ── Create group ──────────────────────────────────────────────────────────────
+async function handleCreate(e) {
+  e.preventDefault();
   const user = await requireAuth();
-  if (!user) {
-    return;
-  }
+  if (!user) return;
 
-  status.textContent = "Creating group...";
+  const btn = createForm.querySelector("button[type=submit]");
+  btn.disabled = true;
+  setStatus("Creating group...");
+
   try {
     const name = createForm.querySelector("#group-name").value.trim();
     const description = createForm.querySelector("#group-description").value.trim();
+
+    if (!name) throw new Error("Group name is required");
+
     const group = await createGroup({ name, description });
     await addGroupMember(group.id, user.id, "owner");
-    status.textContent = `Group created. Invite token: ${group.invite_token}`;
+
+    setStatus(`Group "${name}" created successfully.`);
+    createForm.reset();
     await refreshGroups();
-  } catch (error) {
-    status.textContent = error.message;
+  } catch (err) {
+    setStatus(err.message);
+  } finally {
+    btn.disabled = false;
   }
 }
 
-async function handleJoin(event) {
-  event.preventDefault();
+// ── Join group by token ───────────────────────────────────────────────────────
+async function handleJoin(e) {
+  e.preventDefault();
   const user = await requireAuth();
-  if (!user) {
-    return;
-  }
+  if (!user) return;
 
-  status.textContent = "Joining group...";
+  const btn = joinForm.querySelector("button[type=submit]");
+  btn.disabled = true;
+  setStatus("Joining group...");
+
   try {
     const token = joinForm.querySelector("#group-token").value.trim();
+    if (!token) throw new Error("Please enter an invite token");
+
     await joinGroupByToken(token, user.id);
-    status.textContent = "Joined group";
+    setStatus("Joined group successfully.");
+    joinForm.reset();
     await refreshGroups();
-  } catch (error) {
-    status.textContent = error.message;
+  } catch (err) {
+    if (err.message?.includes("duplicate") || err.code === "23505") {
+      setStatus("You are already a member of this group.");
+    } else {
+      setStatus(err.message);
+    }
+  } finally {
+    btn.disabled = false;
   }
 }
 
-if (createForm) {
-  createForm.addEventListener("submit", handleCreate);
-}
+// ── Event listeners ───────────────────────────────────────────────────────────
+createForm?.addEventListener("submit", handleCreate);
+joinForm?.addEventListener("submit", handleJoin);
 
-if (joinForm) {
-  joinForm.addEventListener("submit", handleJoin);
-}
-
+// ── Init ──────────────────────────────────────────────────────────────────────
 refreshGroups();
-

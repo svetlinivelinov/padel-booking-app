@@ -47,10 +47,10 @@ export async function getUser() {
 export async function requireAuth(redirectTo = "/login.html") {
   const user = await getUser();
   if (!user) {
-    window.location.href = redirectTo;
+    const currentUrl = encodeURIComponent(window.location.pathname + window.location.search);
+    window.location.href = `/login.html?redirect=${currentUrl}`;
     return null;
   }
-
   return user;
 }
 

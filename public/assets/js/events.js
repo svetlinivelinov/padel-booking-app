@@ -1,12 +1,27 @@
 import { requireAuth } from "./auth.js";
-import { createEvent, listGroupEvents, joinEvent, getEvent, updateEvent } from "./database.js";
+
+// Auto-refresh events every 10 seconds
+setInterval(() => refreshEvents(), 10000);
+import {
+  createEvent,
+  listGroupEvents,
+  joinEvent,
+  leaveEvent,
+  getEvent,
+  updateEvent,
+  getEventParticipants,
+  getCurrentUserId,
+} from "./database.js";
 
 const form = document.querySelector("#event-create-form");
 const list = document.querySelector("#event-list");
 const status = document.querySelector("#event-status");
 const groupSelect = document.querySelector("#event-group");
 
-// Auto-select group from URL if present
+// ── Safe status helper ────────────────────────────────────────────────────────
+const setStatus = (msg) => { if (status) status.textContent = msg; };
+
+// ── Auto-select group from URL ────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
   const groupId = params.get("group");
@@ -17,128 +32,257 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 let editingEventId = null;
-// Expose refreshEvents globally for group auto-select
 window.refreshEvents = refreshEvents;
 
-async function refreshEvents() {
-  if (!list || !groupSelect || !groupSelect.value) {
-    return;
+// ── Render a single event card ────────────────────────────────────────────────
+async function renderEventCard(event, userId) {
+  const participants = await getEventParticipants(event.id);
+  const confirmed = participants.filter(p => p.status === "confirmed");
+  const waitlisted = participants.filter(p => p.status === "waitlisted");
+  const myParticipation = participants.find(p => p.user_id === userId);
+
+  // Format date
+  let displayDate = event.date_time;
+  try {
+    displayDate = new Date(displayDate).toLocaleString();
+  } catch (e) {}
+
+  const item = document.createElement("div");
+  item.className = "list-card mb-3";
+
+  // ── Header ──
+  const remaining = event.max_participants - confirmed.length;
+  const spotsText = remaining > 0
+    ? `${confirmed.length}/${event.max_participants} — ${remaining} spots left`
+    : `Full — ${waitlisted.length} on waitlist`;
+
+  item.innerHTML = `
+    <div class="fw-semibold mb-1">${event.description || "Event"}</div>
+    <div class="text-muted small mb-1">${displayDate}</div>
+    <div class="small mb-2">${spotsText}</div>
+
+    <div id="join-section-${event.id}" class="mb-2"></div>
+
+    <div class="mb-2">
+      <div class="small fw-semibold">
+        Confirmed (${confirmed.length}/${event.max_participants})
+      </div>
+      <ul class="list-unstyled mb-0 small">
+        ${confirmed.length === 0
+          ? `<li class="text-muted">No players yet</li>`
+          : confirmed.map((p, i) => `
+              <li class="py-1 border-bottom">
+                ${i + 1}. ${p.user?.display_name || p.user?.username || "Unknown"}
+                ${p.partner_name
+                  ? `<span class="text-muted">& ${p.partner_name}</span>`
+                  : ""}
+              </li>
+            `).join("")
+        }
+      </ul>
+    </div>
+
+    ${waitlisted.length > 0 ? `
+      <div class="mb-2">
+        <div class="small fw-semibold text-warning">
+          Waitlist (${waitlisted.length})
+        </div>
+        <ul class="list-unstyled mb-0 small">
+          ${waitlisted.map((p, i) => `
+            <li class="py-1 border-bottom text-muted">
+              ${i + 1}. ${p.user?.display_name || p.user?.username || "Unknown"}
+              ${p.partner_name ? `& ${p.partner_name}` : ""}
+            </li>
+          `).join("")}
+        </ul>
+      </div>
+    ` : ""}
+
+    <button
+      class="btn btn-sm btn-outline-secondary mt-1"
+      data-edit-id="${event.id}">
+      Edit
+    </button>
+  `;
+
+  // ── Join section ──
+  const joinSection = item.querySelector(`#join-section-${event.id}`);
+  const isCouples = event.type === "couples";
+
+  if (myParticipation) {
+    // Already joined — show badge + leave button
+    const badge = myParticipation.status === "confirmed"
+      ? `<span class="badge bg-success">You're in</span>`
+      : `<span class="badge bg-warning text-dark">You're on the waitlist</span>`;
+
+    joinSection.innerHTML = `
+      <div class="d-flex align-items-center gap-2">
+        ${badge}
+        <button class="btn btn-sm btn-outline-danger" data-leave-id="${event.id}">
+          Leave
+        </button>
+      </div>
+    `;
+
+    joinSection.querySelector(`[data-leave-id]`)
+      .addEventListener("click", async (e) => {
+        if (!confirm("Leave this event?")) return;
+        const btn = e.currentTarget;
+        btn.disabled = true;
+        btn.textContent = "Leaving...";
+        try {
+          console.log("Leaving event", event.id, "user", userId);
+          await leaveEvent(event.id, userId);
+          // Small delay to let Supabase complete the promotion update
+          await new Promise(resolve => setTimeout(resolve, 500));
+          await refreshEvents(); // re-render everything
+        } catch (err) {
+          setStatus(err.message);
+          btn.disabled = false;
+          btn.textContent = "Leave";
+        }
+      });
+
+  } else {
+    // Not joined yet
+    const isFull = confirmed.length >= event.max_participants;
+
+    joinSection.innerHTML = `
+      <div class="d-flex align-items-center gap-2 flex-wrap">
+        ${isCouples ? `
+          <input
+            type="text"
+            class="form-control form-control-sm"
+            id="partner-${event.id}"
+            placeholder="Partner name"
+            style="max-width:200px"
+          />
+        ` : ""}
+        <button class="btn btn-sm btn-sun" data-join-id="${event.id}">
+          ${isFull ? "Join waitlist" : "Join"}
+        </button>
+      </div>
+    `;
+
+    joinSection.querySelector(`[data-join-id]`)
+      .addEventListener("click", async (e) => {
+        const btn = e.currentTarget;
+        btn.disabled = true;
+        btn.textContent = "Joining...";
+
+        try {
+          const partnerName = isCouples
+            ? document.querySelector(`#partner-${event.id}`)?.value.trim()
+            : null;
+
+          if (isCouples && !partnerName) {
+            alert("Please enter your partner's name");
+            btn.disabled = false;
+            btn.textContent = isFull ? "Join waitlist" : "Join";
+            return;
+          }
+
+          const result = await joinEvent(
+            event.id,
+            isCouples ? "couple" : "individual",
+            partnerName
+          );
+
+          setStatus(result === "confirmed"
+            ? "You're in!"
+            : "Added to waitlist"
+          );
+
+          await refreshEvents(); // re-render — this is the key fix
+
+        } catch (err) {
+          setStatus(err.message);
+          btn.disabled = false;
+          btn.textContent = isFull ? "Join waitlist" : "Join";
+        }
+      });
   }
 
-  const events = await listGroupEvents(groupSelect.value);
-  list.innerHTML = "";
-  events.forEach((event) => {
-    const item = document.createElement("div");
-    item.className = "list-card mb-2";
-    // Parse as local time if possible
-    let displayDate = event.date_time;
-    if (displayDate && displayDate.length === 16 && displayDate.includes('T')) {
-      // 'YYYY-MM-DDTHH:mm' format from input
-      const [datePart, timePart] = displayDate.split('T');
-      const [year, month, day] = datePart.split('-');
-      const [hour, minute] = timePart.split(':');
-      const localDate = new Date(year, month - 1, day, hour, minute);
-      displayDate = localDate.toLocaleString();
-    } else if (displayDate) {
-      displayDate = new Date(displayDate).toLocaleString();
-    }
-    item.innerHTML = `<div class=\"fw-semibold\">${event.description || "Event"}</div>
-      <div>${displayDate}</div>
-      <button class=\"btn btn-sm btn-sun mt-2\" data-id=\"${event.id}\">Join</button>
-      <button class=\"btn btn-sm btn-outline-secondary mt-2 ms-2\" data-edit-id=\"${event.id}\">Edit</button>`;
-    list.appendChild(item);
-  });
-
-  list.querySelectorAll("button[data-id]").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      status.textContent = "Joining...";
-      try {
-        const slotType = document.querySelector("#event-slot-type")?.value || "individual";
-        const partnerName = document.querySelector("#event-partner-name")?.value || "";
-        const result = await joinEvent(btn.dataset.id, slotType, partnerName);
-        status.textContent = `Joined as ${result}`;
-      } catch (error) {
-        status.textContent = error.message;
-      }
+  // ── Edit button ──
+  item.querySelector("[data-edit-id]")
+    .addEventListener("click", async () => {
+      const eventData = await getEvent(event.id);
+      if (!eventData) return;
+      editingEventId = event.id;
+      groupSelect.value = eventData.group_id;
+      form.querySelector("#event-date").value = eventData.date_time.slice(0, 16);
+      form.querySelector("#event-max").value = eventData.max_participants;
+      form.querySelector("#event-desc").value = eventData.description;
+      form.querySelector("#event-type").value = eventData.type;
+      setStatus("Editing event...");
+      form.querySelector("button[type='submit']").textContent = "Update event";
     });
-  });
 
-  list.querySelectorAll("button[data-edit-id]").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      const eventId = btn.getAttribute("data-edit-id");
-      const eventData = await getEvent(eventId);
-      if (eventData) {
-        editingEventId = eventId;
-        // Populate form fields
-        groupSelect.value = eventData.group_id;
-        form.querySelector("#event-date").value = eventData.date_time.slice(0, 16); // assumes ISO string
-        form.querySelector("#event-max").value = eventData.max_participants;
-        form.querySelector("#event-desc").value = eventData.description;
-        form.querySelector("#event-type").value = eventData.type;
-        status.textContent = "Editing event...";
-        form.querySelector("button[type='submit']").textContent = "Update event";
-      }
-    });
-  });
+  return item;
 }
 
-async function handleCreate(event) {
-  event.preventDefault();
-  const user = await requireAuth();
-  if (!user) {
+// ── Refresh event list ────────────────────────────────────────────────────────
+export async function refreshEvents() {
+  if (!list || !groupSelect || !groupSelect.value) return;
+
+  const userId = await getCurrentUserId();
+  const events = await listGroupEvents(groupSelect.value);
+
+  list.innerHTML = "";
+
+  if (events.length === 0) {
+    list.innerHTML = `<p class="text-muted">No events yet. Create one!</p>`;
     return;
   }
 
-  // Save the datetime-local value as-is (local time, no timezone conversion)
-  let dateValue = form.querySelector("#event-date").value;
-  // Patch: Remove created_by from update, and ensure date_time has seconds
-  let updatePayload = {
-    group_id: groupSelect.value,
-    date_time: dateValue,
-    max_participants: Number(form.querySelector("#event-max").value),
-    description: form.querySelector("#event-desc").value.trim(),
-    type: form.querySelector("#event-type").value
-  };
-  // If date_time is in 'YYYY-MM-DDTHH:mm', add ':00' for seconds
-  if (updatePayload.date_time && updatePayload.date_time.length === 16) {
-    updatePayload.date_time += ':00';
+  for (const event of events) {
+    const card = await renderEventCard(event, userId);
+    list.appendChild(card);
   }
-  const payload = {
+}
+
+// ── Create / update event ─────────────────────────────────────────────────────
+async function handleCreate(e) {
+  e.preventDefault();
+  const user = await requireAuth();
+  if (!user) return;
+
+  const btn = form.querySelector("button[type='submit']");
+  btn.disabled = true;
+
+  let dateValue = form.querySelector("#event-date").value;
+  if (dateValue && dateValue.length === 16) dateValue += ":00";
+
+  const updatePayload = {
     group_id: groupSelect.value,
-    created_by: user.id,
     date_time: dateValue,
     max_participants: Number(form.querySelector("#event-max").value),
     description: form.querySelector("#event-desc").value.trim(),
-    type: form.querySelector("#event-type").value
+    type: form.querySelector("#event-type").value,
   };
 
   try {
     if (editingEventId) {
-      console.log("Updating event", editingEventId, updatePayload);
-      const updated = await updateEvent(editingEventId, updatePayload);
-      console.log("Update result", updated);
-      status.textContent = "Event updated";
+      await updateEvent(editingEventId, updatePayload);
+      setStatus("Event updated");
       editingEventId = null;
       form.querySelector("button[type='submit']").textContent = "Create event";
     } else {
-      await createEvent(payload);
-      status.textContent = "Event created";
+      await createEvent({ ...updatePayload, created_by: user.id });
+      setStatus("Event created");
     }
     form.reset();
-    refreshEvents();
-  } catch (error) {
-    console.error("Event update/create error", error);
-    status.textContent = error.message;
+    await refreshEvents();
+  } catch (err) {
+    setStatus(err.message);
+  } finally {
+    btn.disabled = false;
   }
 }
 
-if (form) {
-  form.addEventListener("submit", handleCreate);
-}
+// ── Event listeners ───────────────────────────────────────────────────────────
+form?.addEventListener("submit", handleCreate);
+groupSelect?.addEventListener("change", refreshEvents);
 
-if (groupSelect) {
-  groupSelect.addEventListener("change", refreshEvents);
-}
-
+// ── Init ──────────────────────────────────────────────────────────────────────
 refreshEvents();
-
