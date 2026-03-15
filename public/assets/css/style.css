@@ -1,0 +1,74 @@
+:root {
+  --ink: #0b1116;
+  --slate: #1c2a33;
+  --sea: #0c6b5a;
+  --foam: #e6f3ef;
+  --sand: #f6f0e7;
+  --sun: #f4c95d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Space Grotesk", system-ui, -apple-system, sans-serif;
+  color: var(--ink);
+  background: radial-gradient(circle at 20% 10%, #f8f5ee 0%, #eef3f0 35%, #e6eef2 100%);
+  min-height: 100vh;
+}
+
+.navbar {
+  background: rgba(255, 255, 255, 0.85);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(12px);
+}
+
+.hero {
+  padding: 3.5rem 0 2rem;
+}
+
+.hero-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 18px 50px rgba(16, 42, 67, 0.12);
+  padding: 2.5rem;
+}
+
+.card-soft {
+  background: var(--foam);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid rgba(12, 107, 90, 0.12);
+}
+
+.section-title {
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.btn-sun {
+  background: var(--sun);
+  border: none;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.badge-role {
+  background: var(--sea);
+  color: white;
+  font-weight: 600;
+}
+
+.form-status {
+  font-size: 0.95rem;
+  color: var(--slate);
+}
+
+.list-card {
+  background: white;
+  border-radius: 14px;
+  padding: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
