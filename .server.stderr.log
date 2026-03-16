@@ -488,3 +488,492 @@ ConnectionAbortedError: [WinError 10053] An established connection was aborted b
 ::1 - - [16/Mar/2026 01:06:48] code 404, message File not found
 ::1 - - [16/Mar/2026 01:06:48] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
 ::1 - - [16/Mar/2026 01:06:49] "GET /assets/js/database.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:23:32] "GET /dashboard.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:23:32] code 404, message File not found
+::1 - - [16/Mar/2026 01:23:32] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:23:32] "GET /assets/css/style.css HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:23:32] "GET /assets/js/env.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:23:32] "GET /assets/js/groups.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:23:32] "GET /assets/js/feed.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:23:32] "GET /assets/js/auth.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:23:32] "GET /assets/js/config.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:23:32] "GET /assets/js/database.js HTTP/1.1" 200 -
+::1 - - [16/Mar/2026 01:23:39] code 404, message File not found
+::1 - - [16/Mar/2026 01:23:39] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:23:39] "GET /assets/js/events.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:23:39] "GET /assets/js/database.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:23:49] "GET /event.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:23:50] code 404, message File not found
+::1 - - [16/Mar/2026 01:23:50] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:23:50] "GET /assets/js/database.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:23:54] code 404, message File not found
+::1 - - [16/Mar/2026 01:23:54] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:23:54] "GET /assets/js/database.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:27:45] "GET /dashboard.html HTTP/1.1" 200 -
+::1 - - [16/Mar/2026 01:27:45] code 404, message File not found
+::1 - - [16/Mar/2026 01:27:45] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:27:45] "GET /assets/js/database.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:27:47] "GET /court.html HTTP/1.1" 200 -
+::1 - - [16/Mar/2026 01:27:47] code 404, message File not found
+::1 - - [16/Mar/2026 01:27:47] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:27:47] "GET /assets/js/court.js HTTP/1.1" 200 -
+::1 - - [16/Mar/2026 01:27:48] "GET /assets/js/americano.js HTTP/1.1" 200 -
+::1 - - [16/Mar/2026 01:27:48] "GET /login.html?redirect=%2Fcourt.html HTTP/1.1" 200 -
+::1 - - [16/Mar/2026 01:27:48] "GET /assets/js/login-script.js HTTP/1.1" 200 -
+::1 - - [16/Mar/2026 01:27:48] code 404, message File not found
+::1 - - [16/Mar/2026 01:27:48] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:27:51] "GET /court.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:27:51] code 404, message File not found
+::1 - - [16/Mar/2026 01:27:51] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:27:51] code 404, message File not found
+::1 - - [16/Mar/2026 01:27:51] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:27:59] "GET /court.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:27:59] code 404, message File not found
+::1 - - [16/Mar/2026 01:27:59] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:27:59] "GET /assets/js/court.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:27:59] "GET /assets/js/americano.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:27:59] code 404, message File not found
+::1 - - [16/Mar/2026 01:27:59] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:28:01] "GET / HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:28:01] code 404, message File not found
+::1 - - [16/Mar/2026 01:28:01] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:29:06] "GET /login.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:29:06] code 404, message File not found
+::1 - - [16/Mar/2026 01:29:06] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:29:08] "GET /dashboard.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:29:08] code 404, message File not found
+::1 - - [16/Mar/2026 01:29:08] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:29:08] "GET /assets/js/database.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:29:14] "GET /court.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:29:14] code 404, message File not found
+::1 - - [16/Mar/2026 01:29:14] "GET /assets/js/court.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:29:14] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:29:14] "GET /assets/js/americano.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:29:14] code 404, message File not found
+::1 - - [16/Mar/2026 01:29:14] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:29:16] code 404, message File not found
+::1 - - [16/Mar/2026 01:29:16] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:29:17] code 404, message File not found
+::1 - - [16/Mar/2026 01:29:17] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:38:06] "GET /court.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:38:06] code 404, message File not found
+::1 - - [16/Mar/2026 01:38:06] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:38:06] "GET /assets/js/court.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:38:06] "GET /assets/js/auth.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:38:06] "GET /assets/js/database.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:38:06] "GET /assets/js/americano.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:38:06] code 404, message File not found
+::1 - - [16/Mar/2026 01:38:07] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:38:10] code 404, message File not found
+::1 - - [16/Mar/2026 01:38:10] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:38:10] code 404, message File not found
+::1 - - [16/Mar/2026 01:38:10] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:38:12] "GET /signup.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:38:12] code 404, message File not found
+::1 - - [16/Mar/2026 01:38:12] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:38:14] code 404, message File not found
+::1 - - [16/Mar/2026 01:38:14] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:38:16] "GET /dashboard.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:38:16] code 404, message File not found
+::1 - - [16/Mar/2026 01:38:16] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:38:16] "GET /assets/js/groups.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:38:19] code 404, message File not found
+::1 - - [16/Mar/2026 01:38:19] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:38:19] "GET /assets/js/events.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:38:23] "GET /group.html HTTP/1.1" 200 -
+::1 - - [16/Mar/2026 01:38:23] code 404, message File not found
+::1 - - [16/Mar/2026 01:38:23] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:38:26] code 404, message File not found
+::1 - - [16/Mar/2026 01:38:26] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:38:29] "GET /profile.html HTTP/1.1" 200 -
+::1 - - [16/Mar/2026 01:38:29] code 404, message File not found
+::1 - - [16/Mar/2026 01:38:29] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:38:29] "GET /assets/js/profile.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:38:31] code 404, message File not found
+::1 - - [16/Mar/2026 01:38:31] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:38:32] code 404, message File not found
+::1 - - [16/Mar/2026 01:38:32] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:38:35] code 404, message File not found
+::1 - - [16/Mar/2026 01:38:35] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:38:35] code 404, message File not found
+::1 - - [16/Mar/2026 01:38:35] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:38:38] code 404, message File not found
+::1 - - [16/Mar/2026 01:38:38] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:38:38] code 404, message File not found
+::1 - - [16/Mar/2026 01:38:38] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:39:55] code 404, message File not found
+::1 - - [16/Mar/2026 01:39:55] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:39:57] code 404, message File not found
+::1 - - [16/Mar/2026 01:39:57] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:39:58] "GET /dashboard.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:39:58] code 404, message File not found
+::1 - - [16/Mar/2026 01:39:58] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:39:58] "GET /assets/js/database.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:40:00] code 404, message File not found
+::1 - - [16/Mar/2026 01:40:00] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:40:03] code 404, message File not found
+::1 - - [16/Mar/2026 01:40:03] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:42:24] code 404, message File not found
+::1 - - [16/Mar/2026 01:42:24] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:42:24] "GET /assets/js/database.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:42:25] "GET /dashboard.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:42:25] code 404, message File not found
+::1 - - [16/Mar/2026 01:42:25] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:42:27] "GET /dashboard.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:42:27] code 404, message File not found
+::1 - - [16/Mar/2026 01:42:27] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:42:29] "GET /court.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:42:29] code 404, message File not found
+::1 - - [16/Mar/2026 01:42:29] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:42:29] "GET /assets/js/court.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:42:29] "GET /assets/js/americano.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:42:29] "GET /assets/js/login-script.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:42:29] code 404, message File not found
+::1 - - [16/Mar/2026 01:42:29] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:42:31] code 404, message File not found
+::1 - - [16/Mar/2026 01:42:31] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:42:31] code 404, message File not found
+::1 - - [16/Mar/2026 01:42:31] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:42:33] code 404, message File not found
+::1 - - [16/Mar/2026 01:42:33] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:42:35] code 404, message File not found
+::1 - - [16/Mar/2026 01:42:35] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:42:37] code 404, message File not found
+::1 - - [16/Mar/2026 01:42:37] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:42:41] code 404, message File not found
+::1 - - [16/Mar/2026 01:42:41] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:42:42] "GET /assets/js/events.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:42:47] code 404, message File not found
+::1 - - [16/Mar/2026 01:42:47] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:42:48] code 404, message File not found
+::1 - - [16/Mar/2026 01:42:48] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:42:49] code 404, message File not found
+::1 - - [16/Mar/2026 01:42:49] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:42:59] code 404, message File not found
+::1 - - [16/Mar/2026 01:42:59] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:43:01] code 404, message File not found
+::1 - - [16/Mar/2026 01:43:01] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:43:03] code 404, message File not found
+::1 - - [16/Mar/2026 01:43:03] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:43:09] code 404, message File not found
+::1 - - [16/Mar/2026 01:43:09] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:43:09] code 404, message File not found
+::1 - - [16/Mar/2026 01:43:09] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:44:05] "GET /court.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:44:05] code 404, message File not found
+::1 - - [16/Mar/2026 01:44:05] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:44:05] "GET /assets/js/court.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:44:05] "GET /assets/js/americano.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:44:06] code 404, message File not found
+::1 - - [16/Mar/2026 01:44:06] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:44:07] "GET /login.html?redirect=%2Fcourt.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:44:07] code 404, message File not found
+::1 - - [16/Mar/2026 01:44:07] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:44:10] code 404, message File not found
+::1 - - [16/Mar/2026 01:44:10] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:44:11] code 404, message File not found
+::1 - - [16/Mar/2026 01:44:11] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:44:12] "GET /dashboard.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:44:12] code 404, message File not found
+::1 - - [16/Mar/2026 01:44:12] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:44:15] code 404, message File not found
+::1 - - [16/Mar/2026 01:44:15] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:44:16] code 404, message File not found
+::1 - - [16/Mar/2026 01:44:16] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:44:18] "GET /profile.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:44:18] code 404, message File not found
+::1 - - [16/Mar/2026 01:44:18] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:44:18] "GET /assets/js/database.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:44:19] code 404, message File not found
+::1 - - [16/Mar/2026 01:44:19] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:44:21] code 404, message File not found
+::1 - - [16/Mar/2026 01:44:21] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:44:21] code 404, message File not found
+::1 - - [16/Mar/2026 01:44:21] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:44:27] code 404, message File not found
+::1 - - [16/Mar/2026 01:44:27] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:44:29] code 404, message File not found
+::1 - - [16/Mar/2026 01:44:29] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:44:34] code 404, message File not found
+::1 - - [16/Mar/2026 01:44:34] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:44:40] code 404, message File not found
+::1 - - [16/Mar/2026 01:44:40] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:44:40] code 404, message File not found
+::1 - - [16/Mar/2026 01:44:40] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:44:43] code 404, message File not found
+::1 - - [16/Mar/2026 01:44:43] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:44:46] code 404, message File not found
+::1 - - [16/Mar/2026 01:44:46] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:44:48] code 404, message File not found
+::1 - - [16/Mar/2026 01:44:48] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:44:51] code 404, message File not found
+::1 - - [16/Mar/2026 01:44:51] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:44:51] code 404, message File not found
+::1 - - [16/Mar/2026 01:44:51] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:47:39] "GET /court.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:47:39] code 404, message File not found
+::1 - - [16/Mar/2026 01:47:39] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:47:39] "GET /assets/js/court.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:47:40] "GET /assets/js/database.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:47:40] "GET /assets/js/americano.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:47:40] code 404, message File not found
+::1 - - [16/Mar/2026 01:47:40] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:47:42] code 404, message File not found
+::1 - - [16/Mar/2026 01:47:42] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:47:43] code 404, message File not found
+::1 - - [16/Mar/2026 01:47:43] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:47:46] "GET /login.html?redirect=%2Fcourt.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:47:46] code 404, message File not found
+::1 - - [16/Mar/2026 01:47:46] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:47:47] code 404, message File not found
+::1 - - [16/Mar/2026 01:47:47] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:47:48] code 404, message File not found
+::1 - - [16/Mar/2026 01:47:48] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:47:49] code 404, message File not found
+::1 - - [16/Mar/2026 01:47:49] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:47:50] code 404, message File not found
+::1 - - [16/Mar/2026 01:47:50] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:47:52] "GET /dashboard.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:47:52] code 404, message File not found
+::1 - - [16/Mar/2026 01:47:52] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:47:55] code 404, message File not found
+::1 - - [16/Mar/2026 01:47:55] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:47:55] "GET /assets/js/events.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:47:56] "GET /group.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:47:57] code 404, message File not found
+::1 - - [16/Mar/2026 01:47:57] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:47:58] code 404, message File not found
+::1 - - [16/Mar/2026 01:47:58] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:47:59] code 404, message File not found
+::1 - - [16/Mar/2026 01:47:59] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:48:00] code 404, message File not found
+::1 - - [16/Mar/2026 01:48:00] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:50:42] "GET /court.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:50:42] code 404, message File not found
+::1 - - [16/Mar/2026 01:50:42] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:50:42] "GET /assets/js/court.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:50:42] "GET /assets/js/database.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:50:42] "GET /assets/js/americano.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:50:43] code 404, message File not found
+::1 - - [16/Mar/2026 01:50:43] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:50:44] code 404, message File not found
+::1 - - [16/Mar/2026 01:50:44] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:50:45] code 404, message File not found
+::1 - - [16/Mar/2026 01:50:45] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:50:47] code 404, message File not found
+::1 - - [16/Mar/2026 01:50:47] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:50:48] code 404, message File not found
+::1 - - [16/Mar/2026 01:50:48] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:50:50] "GET /login.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:50:50] code 404, message File not found
+::1 - - [16/Mar/2026 01:50:50] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:50:52] "GET /dashboard.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:50:52] code 404, message File not found
+::1 - - [16/Mar/2026 01:50:52] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:50:52] "GET /assets/js/groups.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:50:55] code 404, message File not found
+::1 - - [16/Mar/2026 01:50:55] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:50:57] code 404, message File not found
+::1 - - [16/Mar/2026 01:50:57] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:50:58] code 404, message File not found
+::1 - - [16/Mar/2026 01:50:58] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:50:58] code 404, message File not found
+::1 - - [16/Mar/2026 01:50:58] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:52:11] code 404, message File not found
+::1 - - [16/Mar/2026 01:52:11] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:52:11] code 404, message File not found
+::1 - - [16/Mar/2026 01:52:11] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:52:13] code 404, message File not found
+::1 - - [16/Mar/2026 01:52:13] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:52:13] code 404, message File not found
+::1 - - [16/Mar/2026 01:52:13] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:52:14] code 404, message File not found
+::1 - - [16/Mar/2026 01:52:14] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:52:16] code 404, message File not found
+::1 - - [16/Mar/2026 01:52:16] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:52:17] code 404, message File not found
+::1 - - [16/Mar/2026 01:52:17] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:52:20] "GET /dashboard.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:52:20] code 404, message File not found
+::1 - - [16/Mar/2026 01:52:20] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:52:22] code 404, message File not found
+::1 - - [16/Mar/2026 01:52:22] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:52:22] code 404, message File not found
+::1 - - [16/Mar/2026 01:52:22] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:52:25] code 404, message File not found
+::1 - - [16/Mar/2026 01:52:25] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:52:25] code 404, message File not found
+::1 - - [16/Mar/2026 01:52:25] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:52:27] code 404, message File not found
+::1 - - [16/Mar/2026 01:52:27] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:52:28] code 404, message File not found
+::1 - - [16/Mar/2026 01:52:28] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:52:29] code 404, message File not found
+::1 - - [16/Mar/2026 01:52:29] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:52:32] code 404, message File not found
+::1 - - [16/Mar/2026 01:52:32] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:52:34] code 404, message File not found
+::1 - - [16/Mar/2026 01:52:34] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:52:35] code 404, message File not found
+::1 - - [16/Mar/2026 01:52:35] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:52:36] code 404, message File not found
+::1 - - [16/Mar/2026 01:52:36] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:54:14] "GET /court.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:54:14] code 404, message File not found
+::1 - - [16/Mar/2026 01:54:14] "GET /assets/js/court.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:54:14] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:54:14] "GET /assets/js/database.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:54:14] "GET /assets/js/auth.js HTTP/1.1" 200 -
+::1 - - [16/Mar/2026 01:54:14] "GET /assets/js/americano.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:54:15] code 404, message File not found
+::1 - - [16/Mar/2026 01:54:15] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:54:16] code 404, message File not found
+::1 - - [16/Mar/2026 01:54:16] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:54:19] code 404, message File not found
+::1 - - [16/Mar/2026 01:54:19] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:54:20] code 404, message File not found
+::1 - - [16/Mar/2026 01:54:20] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:54:22] code 404, message File not found
+::1 - - [16/Mar/2026 01:54:22] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:54:22] code 404, message File not found
+::1 - - [16/Mar/2026 01:54:22] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:56:43] "GET /login.html?redirect=%2Fcourt.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:56:43] code 404, message File not found
+::1 - - [16/Mar/2026 01:56:43] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:56:43] "GET /assets/js/auth.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:56:44] code 404, message File not found
+::1 - - [16/Mar/2026 01:56:44] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:56:45] code 404, message File not found
+::1 - - [16/Mar/2026 01:56:45] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:56:46] code 404, message File not found
+::1 - - [16/Mar/2026 01:56:46] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:56:48] code 404, message File not found
+::1 - - [16/Mar/2026 01:56:48] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:56:49] "GET /dashboard.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:56:49] code 404, message File not found
+::1 - - [16/Mar/2026 01:56:49] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:56:51] "GET /event.html HTTP/1.1" 200 -
+::1 - - [16/Mar/2026 01:56:51] code 404, message File not found
+::1 - - [16/Mar/2026 01:56:51] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:56:52] "GET /assets/js/events.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:56:53] "GET /group.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:56:53] code 404, message File not found
+::1 - - [16/Mar/2026 01:56:53] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:56:55] code 404, message File not found
+::1 - - [16/Mar/2026 01:56:55] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:56:57] code 404, message File not found
+::1 - - [16/Mar/2026 01:56:57] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:56:58] "GET /court.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:56:58] code 404, message File not found
+::1 - - [16/Mar/2026 01:56:58] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:56:58] "GET /assets/js/court.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:56:58] "GET /assets/js/americano.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:56:58] code 404, message File not found
+::1 - - [16/Mar/2026 01:56:58] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:57:44] code 404, message File not found
+::1 - - [16/Mar/2026 01:57:44] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:57:45] "GET /assets/js/database.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:57:45] code 404, message File not found
+::1 - - [16/Mar/2026 01:57:45] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:57:46] code 404, message File not found
+::1 - - [16/Mar/2026 01:57:46] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:57:46] "GET /assets/js/env.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:57:48] code 404, message File not found
+::1 - - [16/Mar/2026 01:57:48] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:57:50] code 404, message File not found
+::1 - - [16/Mar/2026 01:57:50] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:57:52] code 404, message File not found
+::1 - - [16/Mar/2026 01:57:52] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:57:53] code 404, message File not found
+::1 - - [16/Mar/2026 01:57:53] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:57:56] code 404, message File not found
+::1 - - [16/Mar/2026 01:57:56] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:57:56] code 404, message File not found
+::1 - - [16/Mar/2026 01:57:56] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:59:00] code 404, message File not found
+::1 - - [16/Mar/2026 01:59:00] "GET /assets/css/style.css HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:59:00] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 01:59:00] "GET /assets/js/login-script.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:59:00] "GET /assets/js/auth.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 01:59:00] "GET /assets/js/config.js HTTP/1.1" 200 -
+::1 - - [16/Mar/2026 01:59:01] code 404, message File not found
+::1 - - [16/Mar/2026 01:59:01] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 02:00:05] code 404, message File not found
+::1 - - [16/Mar/2026 02:00:05] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 02:00:05] "GET /assets/js/config.js HTTP/1.1" 200 -
+::1 - - [16/Mar/2026 02:00:06] code 404, message File not found
+::1 - - [16/Mar/2026 02:00:06] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 02:00:06] "GET /assets/js/config.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:00:07] "GET /dashboard.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:00:07] code 404, message File not found
+::1 - - [16/Mar/2026 02:00:07] "GET /assets/js/feed.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:00:07] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 02:00:07] "GET /assets/js/config.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:00:09] "GET /event.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:00:09] code 404, message File not found
+::1 - - [16/Mar/2026 02:00:09] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 02:00:10] "GET /assets/js/config.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:00:12] code 404, message File not found
+::1 - - [16/Mar/2026 02:00:12] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 02:00:12] "GET /assets/js/config.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:00:13] "GET /court.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:00:13] code 404, message File not found
+::1 - - [16/Mar/2026 02:00:13] "GET /assets/js/court.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:00:13] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 02:00:13] "GET /assets/js/americano.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:00:13] "GET /assets/js/config.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:05:52] "GET /court.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:05:52] code 404, message File not found
+::1 - - [16/Mar/2026 02:05:52] "GET /assets/js/court.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:05:52] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 02:05:52] "GET /assets/js/auth.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:05:52] "GET /assets/js/americano.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:05:52] "GET /assets/js/database.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:05:52] "GET /assets/js/config.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:05:59] "GET /court.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:05:59] code 404, message File not found
+::1 - - [16/Mar/2026 02:05:59] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 02:06:30] "GET /court.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:06:30] code 404, message File not found
+::1 - - [16/Mar/2026 02:06:30] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 02:06:30] "GET /assets/js/config.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:07:48] "GET /court.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:07:48] code 404, message File not found
+::1 - - [16/Mar/2026 02:07:48] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 02:07:48] "GET /assets/js/config.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:08:24] "GET /court.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:08:24] code 404, message File not found
+::1 - - [16/Mar/2026 02:08:24] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 02:08:25] "GET /assets/js/auth.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:09:18] "GET /court.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:09:18] code 404, message File not found
+::1 - - [16/Mar/2026 02:09:18] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 02:09:18] "GET /assets/js/config.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:15:44] "GET /court.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:15:44] code 404, message File not found
+::1 - - [16/Mar/2026 02:15:44] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 02:15:44] "GET /assets/js/court.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:15:44] "GET /assets/js/auth.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:15:44] "GET /assets/js/americano.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:15:44] "GET /assets/js/config.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:15:44] "GET /assets/js/database.js HTTP/1.1" 200 -
+::1 - - [16/Mar/2026 02:17:16] "GET /court.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:17:16] code 404, message File not found
+::1 - - [16/Mar/2026 02:17:16] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 02:17:17] "GET /assets/js/database.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:18:53] "GET /dashboard.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:18:54] code 404, message File not found
+::1 - - [16/Mar/2026 02:18:54] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 02:18:54] "GET /assets/js/groups.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:18:54] "GET /assets/js/database.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:18:54] "GET /assets/js/config.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:18:59] "GET /group.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:18:59] code 404, message File not found
+::1 - - [16/Mar/2026 02:18:59] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 02:18:59] "GET /assets/js/auth.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:19:02] "GET /event.html HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:19:03] code 404, message File not found
+::1 - - [16/Mar/2026 02:19:03] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [16/Mar/2026 02:19:03] "GET /assets/js/events.js HTTP/1.1" 304 -
+::1 - - [16/Mar/2026 02:19:06] code 404, message File not found
+::1 - - [16/Mar/2026 02:19:06] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -

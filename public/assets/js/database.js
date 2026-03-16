@@ -1,8 +1,18 @@
 // ── Court / match functions ───────────────────────────────────────────────────
 
 export async function startGame(eventId, pointsPerMatch, totalRounds) {
-  // Update event status
-  const { error: eventError } = await supabase
+  // Prevent starting if already active
+  const { data: event, error: eventError1 } = await supabase
+    .from("events")
+    .select("game_status")
+    .eq("id", eventId)
+    .maybeSingle();
+  if (eventError1) throw eventError1;
+  if (event && event.game_status === "active") {
+    throw new Error("Game already started");
+  }
+
+  const { error: eventError2 } = await supabase
     .from("events")
     .update({
       game_status: "active",
@@ -11,7 +21,7 @@ export async function startGame(eventId, pointsPerMatch, totalRounds) {
     })
     .eq("id", eventId);
 
-  if (eventError) throw eventError;
+  if (eventError2) throw eventError2;
 }
 
 export async function generateRound(eventId, roundNumber, matches) {
@@ -98,15 +108,30 @@ export async function getLeaderboard(eventId) {
 }
 
 export async function getCurrentRound(eventId) {
+  // Get the first round that has pending matches
   const { data, error } = await supabase
     .from("rounds")
     .select("*")
     .eq("event_id", eventId)
-    .order("round_number", { ascending: false })
+    .eq("status", "active")
+    .order("round_number", { ascending: true })
     .limit(1)
     .maybeSingle();
 
   if (error) throw error;
+
+  // If no active round, get the latest completed one
+  if (!data) {
+    const { data: last } = await supabase
+      .from("rounds")
+      .select("*")
+      .eq("event_id", eventId)
+      .order("round_number", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    return last;
+  }
+
   return data;
 }
 // Get all participants for an event
