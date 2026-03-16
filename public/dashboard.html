@@ -19,7 +19,7 @@
         <a class="nav-link" href="/event.html">Events</a>
         <a class="nav-link" href="/court.html">Court</a>
         <a class="nav-link" href="/profile.html">Profile</a>
-        <button id="signout-btn" class="btn btn-link nav-link p-0 ms-2" style="color:inherit;">Sign out</button>
+        <button id="signout-btn" type="button" class="btn btn-link nav-link p-0 ms-2" style="color:inherit;">Sign out</button>
       </div>
     </div>
   </nav>
@@ -49,14 +49,22 @@
     import { getProfile } from "/assets/js/database.js";
     (async () => {
       const user = await getUser();
+      const displayEl = document.getElementById("user-display");
+      if (!displayEl) return;
+
       if (user) {
-        // Try to get display name from profile
-        let display = user.email;
+        let display = user.email || "Player";
         try {
           const { data } = await getProfile(user.id);
-          if (data && data.display_name) display = data.display_name;
+          if (data?.display_name) {
+            display = data.display_name;
+          } else if (data?.username) {
+            display = data.username;
+          }
         } catch {}
-        document.getElementById("user-display").textContent = `(${display})`;
+        displayEl.textContent = `(${display})`;
+      } else {
+        displayEl.textContent = "";
       }
     })();
   </script>
@@ -65,8 +73,14 @@
     const btn = document.getElementById("signout-btn");
     if (btn) {
       btn.addEventListener("click", async () => {
-        await signOut();
-        window.location.href = "/login.html";
+        btn.disabled = true;
+        try {
+          await signOut();
+          window.location.href = "/login.html";
+        } catch (error) {
+          alert(error.message || "Failed to sign out");
+          btn.disabled = false;
+        }
       });
     }
   </script>

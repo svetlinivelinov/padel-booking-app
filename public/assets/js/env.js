@@ -1,3 +1,3 @@
-window.SUPABASE_URL = "https://dpcftvjuqslqbmbfhgop.supabase.co";
-window.SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwY2Z0dmp1cXNscWJtYmZoZ29wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1ODkwOTQsImV4cCI6MjA4OTE2NTA5NH0.P70_qMTPIbz5WJmwZ9NBLmw9dHYUtlqmhxy38btgpDY";
+window.SUPABASE_URL = window.SUPABASE_URL || "https://dpcftvjuqslqbmbfhgop.supabase.co";
+window.SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwY2Z0dmp1cXNscWJtYmZoZ29wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1ODkwOTQsImV4cCI6MjA4OTE2NTA5NH0.P70_qMTPIbz5WJmwZ9NBLmw9dHYUtlqmhxy38btgpDY";
 

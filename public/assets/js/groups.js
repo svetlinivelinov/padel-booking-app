@@ -77,7 +77,22 @@ export async function refreshGroups() {
     return;
   }
 
-  const groups = await listMyGroups(user.id);
+  let groups = [];
+  try {
+    groups = await listMyGroups(user.id);
+  } catch (err) {
+    setStatus(err?.message || "Failed to load groups.");
+    if (list) {
+      list.innerHTML = `<p class="text-danger">Could not load groups right now.</p>`;
+    }
+    ["#group-select", "#event-group"].forEach((selector) => {
+      const select = document.querySelector(selector);
+      if (select) {
+        select.innerHTML = `<option value="">Unable to load groups</option>`;
+      }
+    });
+    return;
+  }
 
   // ── Group list display ──
   if (list) {

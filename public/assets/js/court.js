@@ -108,9 +108,13 @@ startBtn.addEventListener("click", async () => {
   startStatus.textContent = "Generating rounds...";
 
   try {
-    const pointsPerMatch = parseInt(document.querySelector("#points-per-match").value);
-    const totalRounds = parseInt(document.querySelector("#total-rounds").value);
+    const pointsPerMatch = Number.parseInt(document.querySelector("#points-per-match").value, 10);
+    const totalRounds = Number.parseInt(document.querySelector("#total-rounds").value, 10);
     const courts = Math.floor(Object.keys(playerProfiles).length / 4);
+
+    if (Number.isNaN(pointsPerMatch) || Number.isNaN(totalRounds)) {
+      throw new Error("Please provide valid game settings");
+    }
 
     if (Object.keys(playerProfiles).length < 4) {
       throw new Error("Need at least 4 confirmed players to start");
@@ -239,11 +243,19 @@ function renderCourtCard(match, isOrganizer) {
   card.querySelector(`[data-submit-match]`)
     ?.addEventListener("click", async (e) => {
       const btn = e.currentTarget;
-      const scoreA = parseInt(document.querySelector(`#score-a-${match.id}`)?.value);
-      const scoreB = parseInt(document.querySelector(`#score-b-${match.id}`)?.value);
+      const scoreA = Number.parseInt(document.querySelector(`#score-a-${match.id}`)?.value, 10);
+      const scoreB = Number.parseInt(document.querySelector(`#score-b-${match.id}`)?.value, 10);
 
       if (isNaN(scoreA) || isNaN(scoreB)) {
         alert("Please enter both scores");
+        return;
+      }
+      if (scoreA < 0 || scoreB < 0) {
+        alert("Scores cannot be negative");
+        return;
+      }
+      if (scoreA > currentEvent.points_per_match || scoreB > currentEvent.points_per_match) {
+        alert(`Scores cannot exceed ${currentEvent.points_per_match}`);
         return;
       }
       if (scoreA + scoreB !== currentEvent.points_per_match) {
@@ -322,7 +334,7 @@ async function renderLeaderboard() {
 
 // ── Auto refresh every 15 seconds ─────────────────────────────────────────────
 setInterval(() => {
-  if (currentEvent?.game_status === "active") loadRound();
+  if (!document.hidden && currentEvent?.game_status === "active") loadRound();
 }, 15000);
 
 // ── Start ─────────────────────────────────────────────────────────────────────

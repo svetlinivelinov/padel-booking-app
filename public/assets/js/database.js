@@ -1,13 +1,22 @@
+import { supabase } from "./config.js";
+
 // ── Court / match functions ───────────────────────────────────────────────────
 
 export async function startGame(eventId, pointsPerMatch, totalRounds) {
+  const userId = await getCurrentUserId();
+  if (!userId) throw new Error("Please sign in");
+
   // Prevent starting if already active
   const { data: event, error: eventError1 } = await supabase
     .from("events")
-    .select("game_status")
+    .select("game_status, created_by")
     .eq("id", eventId)
     .maybeSingle();
   if (eventError1) throw eventError1;
+  if (!event) throw new Error("Event not found");
+  if (event.created_by !== userId) {
+    throw new Error("Only the organizer can start the game");
+  }
   if (event && event.game_status === "active") {
     throw new Error("Game already started");
   }
@@ -201,6 +210,15 @@ export async function regenerateInviteToken(groupId) {
   return data && data.length ? data[0] : null;
 }
 export async function updateEvent(eventId, updates) {
+  const userId = await getCurrentUserId();
+  if (!userId) throw new Error("Please sign in");
+
+  const current = await getEvent(eventId);
+  if (!current) throw new Error("Event not found");
+  if (current.created_by !== userId) {
+    throw new Error("Only the organizer can update this event");
+  }
+
   const { data, error } = await supabase
     .from("events")
     .update(updates)
@@ -211,7 +229,6 @@ export async function updateEvent(eventId, updates) {
   }
   return data && data.length ? data[0] : null;
 }
-import { supabase } from "./config.js";
 
 export async function getCurrentUserId() {
   const { data } = await supabase.auth.getUser();
@@ -233,9 +250,12 @@ export async function upsertProfile(profile) {
 }
 
 export async function createGroup({ name, description }) {
+  const ownerId = await getCurrentUserId();
+  if (!ownerId) throw new Error("Please sign in");
+
   const { data, error } = await supabase
     .from("groups")
-    .insert({ name, description })
+    .insert({ name, description, owner_id: ownerId })
     .select("*")
     .single();
 

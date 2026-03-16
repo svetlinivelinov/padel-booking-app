@@ -24,9 +24,20 @@ async function handleSignup(event) {
   event.preventDefault();
   const email = signupForm.querySelector("#signup-email").value.trim();
   const password = signupForm.querySelector("#signup-password").value;
+  const confirmPassword = signupForm.querySelector("#signup-password-confirm").value;
   const displayName = signupForm.querySelector("#signup-display").value.trim();
   const username = signupForm.querySelector("#signup-username").value.trim();
   const status = document.querySelector("#signup-status");
+
+  const strongEnough = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(password);
+  if (password !== confirmPassword) {
+    status.textContent = "Passwords do not match.";
+    return;
+  }
+  if (!strongEnough) {
+    status.textContent = "Use at least 8 chars with uppercase, lowercase, and a number.";
+    return;
+  }
 
   status.textContent = "Creating account...";
   try {

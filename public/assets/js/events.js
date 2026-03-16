@@ -1,7 +1,9 @@
 import { requireAuth } from "./auth.js";
 
 // Auto-refresh events every 10 seconds
-setInterval(() => refreshEvents(), 10000);
+setInterval(() => {
+  if (!document.hidden) refreshEvents();
+}, 10000);
 import {
   createEvent,
   listGroupEvents,
@@ -131,7 +133,6 @@ async function renderEventCard(event, userId) {
         btn.disabled = true;
         btn.textContent = "Leaving...";
         try {
-          console.log("Leaving event", event.id, "user", userId);
           await leaveEvent(event.id, userId);
           // Small delay to let Supabase complete the promotion update
           await new Promise(resolve => setTimeout(resolve, 500));
@@ -253,12 +254,40 @@ async function handleCreate(e) {
   let dateValue = form.querySelector("#event-date").value;
   if (dateValue && dateValue.length === 16) dateValue += ":00";
 
+   const eventType = form.querySelector("#event-type").value;
+   const maxParticipants = Number(form.querySelector("#event-max").value);
+   const eventDate = new Date(dateValue);
+
+   if (!Number.isInteger(maxParticipants) || maxParticipants < 2) {
+    setStatus("Max participants must be at least 2.");
+    btn.disabled = false;
+    return;
+  }
+
+  if (eventType === "couples" && maxParticipants % 2 !== 0) {
+    setStatus("Couples events require an even number of participants.");
+    btn.disabled = false;
+    return;
+  }
+
+  if (!dateValue || Number.isNaN(eventDate.getTime())) {
+    setStatus("Please provide a valid event date and time.");
+    btn.disabled = false;
+    return;
+  }
+
+  if (eventDate <= new Date()) {
+    setStatus("Event date must be in the future.");
+    btn.disabled = false;
+    return;
+  }
+
   const updatePayload = {
     group_id: groupSelect.value,
     date_time: dateValue,
-    max_participants: Number(form.querySelector("#event-max").value),
+    max_participants: maxParticipants,
     description: form.querySelector("#event-desc").value.trim(),
-    type: form.querySelector("#event-type").value,
+    type: eventType,
   };
 
   try {
