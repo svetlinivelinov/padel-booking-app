@@ -27,6 +27,16 @@ A vanilla JS + Supabase scaffold for the Bokacourt flow described in the archite
 3) Publish directory: public
 4) In Supabase Auth settings, add your Netlify site URL to Site URL and add redirect URLs for your domain.
 
+## Automatic Supabase Migrations (GitHub Actions)
+1) The workflow file is at .github/workflows/supabase-migrations.yml.
+2) It runs automatically on push to main when files under supabase/migrations/ change.
+3) It can also be run manually from the GitHub Actions tab (workflow_dispatch).
+4) Add these repository secrets in GitHub:
+	- SUPABASE_ACCESS_TOKEN
+	- SUPABASE_PROJECT_REF
+	- SUPABASE_DB_PASSWORD
+5) Recommended: protect main branch and require pull request review before merge.
+
 ## Notes
 - The migration includes a basic trigger to create a user_profiles row on signup.
 - RLS has been hardened in 002 and recursion-safe fixes were added in 003.
@@ -39,4 +49,5 @@ A vanilla JS + Supabase scaffold for the Bokacourt flow described in the archite
 1) Confirm `public/assets/js/config.js` does not contain hardcoded Supabase keys.
 2) Confirm your database has migrations 001, 002, and 003 applied.
 3) Confirm `public/assets/js/env.js` is ignored by git and not committed with real secrets.
+4) Confirm GitHub repository secrets for migration automation are configured.
 
