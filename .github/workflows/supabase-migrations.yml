@@ -16,50 +16,28 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
-      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Validate secret configuration
+      - name: Validate SUPABASE_DB_URL
         run: |
-          has_db_url=false
-          has_access=false
-          has_ref=false
-          has_pwd=false
-
-          [ -n "$SUPABASE_DB_URL" ] && has_db_url=true
-          [ -n "$SUPABASE_ACCESS_TOKEN" ] && has_access=true
-          [ -n "$SUPABASE_PROJECT_REF" ] && has_ref=true
-          [ -n "$SUPABASE_DB_PASSWORD" ] && has_pwd=true
-
-          echo "Secret presence: DB_URL=$has_db_url ACCESS_TOKEN=$has_access PROJECT_REF=$has_ref DB_PASSWORD=$has_pwd"
-
-          if [ -n "$SUPABASE_DB_URL" ]; then
-            echo "Using SUPABASE_DB_URL mode"
-          else
-            test -n "$SUPABASE_ACCESS_TOKEN" || (echo "Missing SUPABASE_ACCESS_TOKEN" && exit 1)
-            test -n "$SUPABASE_PROJECT_REF" || (echo "Missing SUPABASE_PROJECT_REF" && exit 1)
-            test -n "$SUPABASE_DB_PASSWORD" || (echo "Missing SUPABASE_DB_PASSWORD" && exit 1)
-            echo "Using ACCESS_TOKEN + PROJECT_REF + DB_PASSWORD mode"
+          test -n "$SUPABASE_DB_URL" || (echo "Missing SUPABASE_DB_URL" && exit 1)
+          case "$SUPABASE_DB_URL" in
+            postgres://*|postgresql://*) ;;
+            *) echo "SUPABASE_DB_URL must start with postgres:// or postgresql://"; exit 1 ;;
+          esac
+          if printf '%s' "$SUPABASE_DB_URL" | grep -q '[[:space:]]'; then
+            echo "SUPABASE_DB_URL contains whitespace. Re-save the secret without spaces/new lines."
+            exit 1
           fi
+          echo "Using one-secret mode (SUPABASE_DB_URL)"
 
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v1
         with:
           version: latest
 
-      - name: Link Supabase project (3-secret mode)
-        if: env.SUPABASE_DB_URL == ''
-        run: supabase link --project-ref "$SUPABASE_PROJECT_REF"
-
       - name: Push pending migrations
-        run: |
-          if [ -n "$SUPABASE_DB_URL" ]; then
-            supabase db push --db-url "$SUPABASE_DB_URL"
-          else
-            supabase db push --password "$SUPABASE_DB_PASSWORD"
-          fi
+        run: supabase db push --db-url "$SUPABASE_DB_URL"
