@@ -31,10 +31,9 @@ A vanilla JS + Supabase scaffold for the Bokacourt flow described in the archite
 1) The workflow file is at .github/workflows/supabase-migrations.yml.
 2) It runs automatically on push to main when files under supabase/migrations/ change.
 3) It can also be run manually from the GitHub Actions tab (workflow_dispatch).
-4) Add these repository secrets in GitHub:
-	- SUPABASE_ACCESS_TOKEN
-	- SUPABASE_PROJECT_REF
-	- SUPABASE_DB_PASSWORD
+4) Configure one of these secret modes in GitHub:
+	- Easiest mode (recommended): SUPABASE_DB_URL
+	- Advanced mode: SUPABASE_ACCESS_TOKEN, SUPABASE_PROJECT_REF, SUPABASE_DB_PASSWORD
 5) Recommended: protect main branch and require pull request review before merge.
 
 ## Notes
