@@ -1,3 +1,114 @@
+// ── Court / match functions ───────────────────────────────────────────────────
+
+export async function startGame(eventId, pointsPerMatch, totalRounds) {
+  // Update event status
+  const { error: eventError } = await supabase
+    .from("events")
+    .update({
+      game_status: "active",
+      points_per_match: pointsPerMatch,
+      total_rounds: totalRounds,
+    })
+    .eq("id", eventId);
+
+  if (eventError) throw eventError;
+}
+
+export async function generateRound(eventId, roundNumber, matches) {
+  // Create round
+  const { data: round, error: roundError } = await supabase
+    .from("rounds")
+    .insert({ event_id: eventId, round_number: roundNumber })
+    .select("*")
+    .single();
+
+  if (roundError) throw roundError;
+
+  // Insert matches
+  const matchRows = matches.map((m, i) => ({
+    event_id: eventId,
+    round_id: round.id,
+    round_number: roundNumber,
+    court_number: i + 1,
+    team_a_p1: m.team_a[0],
+    team_a_p2: m.team_a[1],
+    team_b_p1: m.team_b[0],
+    team_b_p2: m.team_b[1],
+    status: "pending",
+  }));
+
+  const { error: matchError } = await supabase
+    .from("matches")
+    .insert(matchRows);
+
+  if (matchError) throw matchError;
+
+  return round;
+}
+
+export async function getMatches(eventId, roundNumber) {
+  const { data, error } = await supabase
+    .from("matches")
+    .select("*")
+    .eq("event_id", eventId)
+    .eq("round_number", roundNumber)
+    .order("court_number", { ascending: true });
+
+  if (error) throw error;
+  return data;
+}
+
+export async function submitScore(matchId, scoreA, scoreB) {
+  const { error } = await supabase
+    .from("matches")
+    .update({ score_a: scoreA, score_b: scoreB, status: "completed" })
+    .eq("id", matchId);
+
+  if (error) throw error;
+}
+
+export async function getLeaderboard(eventId) {
+  const { data, error } = await supabase
+    .from("matches")
+    .select("*")
+    .eq("event_id", eventId)
+    .eq("status", "completed");
+
+  if (error) throw error;
+
+  // Compute scores per player
+  const scores = {};
+
+  data.forEach((match) => {
+    [match.team_a_p1, match.team_a_p2].forEach((pid) => {
+      if (!pid) return;
+      if (!scores[pid]) scores[pid] = { points: 0, played: 0 };
+      scores[pid].points += match.score_a || 0;
+      scores[pid].played += 1;
+    });
+    [match.team_b_p1, match.team_b_p2].forEach((pid) => {
+      if (!pid) return;
+      if (!scores[pid]) scores[pid] = { points: 0, played: 0 };
+      scores[pid].points += match.score_b || 0;
+      scores[pid].played += 1;
+    });
+  });
+
+  return scores;
+}
+
+export async function getCurrentRound(eventId) {
+  const { data, error } = await supabase
+    .from("rounds")
+    .select("*")
+    .eq("event_id", eventId)
+    .order("round_number", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
+}
 // Get all participants for an event
 export async function getEventParticipants(eventId) {
   const { data, error } = await supabase

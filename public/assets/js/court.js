@@ -1,0 +1,329 @@
+import { requireAuth } from "./auth.js";
+import {
+  listMyGroups,
+  listGroupEvents,
+  getEventParticipants,
+  getEvent,
+  startGame,
+  generateRound,
+  getMatches,
+  submitScore,
+  getLeaderboard,
+  getCurrentRound,
+  getCurrentUserId,
+} from "./database.js";
+import { generateAmericanoRounds } from "./americano.js";
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let currentEvent = null;
+let currentUser = null;
+let allRounds = [];
+let currentRoundIndex = 0;
+let playerProfiles = {};
+
+// ── Elements ──────────────────────────────────────────────────────────────────
+const eventSelect    = document.querySelector("#court-event-select");
+const startPanel     = document.querySelector("#start-panel");
+const gamePanel      = document.querySelector("#game-panel");
+const waitingPanel   = document.querySelector("#waiting-panel");
+const startBtn       = document.querySelector("#start-btn");
+const startStatus    = document.querySelector("#start-status");
+const roundLabel     = document.querySelector("#round-label");
+const roundSub       = document.querySelector("#round-sub");
+const courtCards     = document.querySelector("#court-cards");
+const leaderboard    = document.querySelector("#leaderboard");
+const nextRoundBtn   = document.querySelector("#next-round-btn");
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+async function init() {
+  currentUser = await requireAuth();
+  if (!currentUser) return;
+
+  await loadEventOptions();
+  eventSelect.addEventListener("change", () => loadCourt());
+  if (eventSelect.value) loadCourt();
+}
+
+// ── Load event dropdown ───────────────────────────────────────────────────────
+async function loadEventOptions() {
+  const groups = await listMyGroups(currentUser.id);
+  const allEvents = [];
+
+  for (const group of groups) {
+    const events = await listGroupEvents(group.id);
+    events.forEach(e => allEvents.push({ ...e, groupName: group.name }));
+  }
+
+  eventSelect.innerHTML = allEvents.length === 0
+    ? `<option value="">No events found</option>`
+    : allEvents.map(e => `
+        <option value="${e.id}">
+          ${e.description || "Event"} — ${new Date(e.date_time).toLocaleDateString()}
+        </option>
+      `).join("");
+
+  // Auto-select from URL
+  const params = new URLSearchParams(window.location.search);
+  const eventId = params.get("event");
+  if (eventId) eventSelect.value = eventId;
+}
+
+// ── Load court for selected event ─────────────────────────────────────────────
+async function loadCourt() {
+  const eventId = eventSelect.value;
+  if (!eventId) return;
+
+  currentEvent = await getEvent(eventId);
+  if (!currentEvent) return;
+
+  // Load player profiles for name display
+  const participants = await getEventParticipants(eventId);
+  const confirmed = participants.filter(p => p.status === "confirmed");
+  playerProfiles = {};
+  confirmed.forEach(p => {
+    playerProfiles[p.user_id] = p.user?.display_name || p.user?.username || "Player";
+  });
+
+  // Determine what to show
+  const isOrganizer = currentEvent.created_by === currentUser.id;
+  const gameStarted = currentEvent.game_status === "active";
+
+  startPanel.style.display   = "none";
+  gamePanel.style.display    = "none";
+  waitingPanel.style.display = "none";
+
+  if (!gameStarted && isOrganizer) {
+    startPanel.style.display = "block";
+  } else if (gameStarted) {
+    gamePanel.style.display = "block";
+    await loadRound();
+  } else {
+    waitingPanel.style.display = "block";
+  }
+}
+
+// ── Start game ────────────────────────────────────────────────────────────────
+startBtn.addEventListener("click", async () => {
+  startBtn.disabled = true;
+  startStatus.textContent = "Generating rounds...";
+
+  try {
+    const pointsPerMatch = parseInt(document.querySelector("#points-per-match").value);
+    const totalRounds = parseInt(document.querySelector("#total-rounds").value);
+    const courts = Math.floor(Object.keys(playerProfiles).length / 4);
+
+    if (Object.keys(playerProfiles).length < 4) {
+      throw new Error("Need at least 4 confirmed players to start");
+    }
+
+    // Generate all rounds upfront
+    const playerIds = Object.keys(playerProfiles);
+    allRounds = generateAmericanoRounds(playerIds, totalRounds, courts);
+
+    // Save game settings
+    await startGame(currentEvent.id, pointsPerMatch, totalRounds);
+
+    // Save all rounds and matches to DB
+    for (let i = 0; i < allRounds.length; i++) {
+      await generateRound(currentEvent.id, i + 1, allRounds[i]);
+    }
+
+    startStatus.textContent = "Game started!";
+
+    // Switch to game view
+    startPanel.style.display = "none";
+    gamePanel.style.display  = "block";
+    currentRoundIndex = 0;
+    await loadRound();
+
+  } catch (err) {
+    startStatus.textContent = err.message;
+    startBtn.disabled = false;
+  }
+});
+
+// ── Load current round ────────────────────────────────────────────────────────
+async function loadRound() {
+  const round = await getCurrentRound(currentEvent.id);
+  if (!round) return;
+
+  currentRoundIndex = round.round_number;
+  roundLabel.textContent = `Round ${round.round_number}`;
+  roundSub.textContent   = `of ${currentEvent.total_rounds}`;
+
+  const matches = await getMatches(currentEvent.id, round.round_number);
+  const isOrganizer = currentEvent.created_by === currentUser.id;
+  const allScored = matches.every(m => m.status === "completed");
+  const isLastRound = round.round_number >= currentEvent.total_rounds;
+
+  // Show next round button for organizer if all scored and not last round
+  if (isOrganizer && allScored && !isLastRound) {
+    nextRoundBtn.style.display = "block";
+  } else {
+    nextRoundBtn.style.display = "none";
+  }
+
+  // Render court cards
+  courtCards.innerHTML = "";
+  matches.forEach(match => {
+    const card = renderCourtCard(match, isOrganizer);
+    courtCards.appendChild(card);
+  });
+
+  // Render leaderboard
+  await renderLeaderboard();
+}
+
+// ── Render a court card ───────────────────────────────────────────────────────
+function renderCourtCard(match, isOrganizer) {
+  const p = playerProfiles;
+  const isMyMatch = [
+    match.team_a_p1, match.team_a_p2,
+    match.team_b_p1, match.team_b_p2
+  ].includes(currentUser.id);
+
+  const card = document.createElement("div");
+  card.className = `list-card mb-3 ${isMyMatch ? "border-success" : ""}`;
+
+  const scored = match.status === "completed";
+
+  card.innerHTML = `
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <span class="fw-semibold">Court ${match.court_number}</span>
+      ${isMyMatch ? `<span class="badge bg-success">Your match</span>` : ""}
+      ${scored ? `<span class="badge bg-secondary">Done</span>` : ""}
+    </div>
+    <div class="d-flex justify-content-between align-items-center">
+      <div class="text-center" style="flex:1">
+        <div class="small fw-semibold">${p[match.team_a_p1] || "?"}</div>
+        <div class="small text-muted">${p[match.team_a_p2] || "?"}</div>
+      </div>
+      <div class="text-center px-3">
+        ${scored
+          ? `<span class="fw-bold">${match.score_a} — ${match.score_b}</span>`
+          : `<span class="text-muted">vs</span>`
+        }
+      </div>
+      <div class="text-center" style="flex:1">
+        <div class="small fw-semibold">${p[match.team_b_p1] || "?"}</div>
+        <div class="small text-muted">${p[match.team_b_p2] || "?"}</div>
+      </div>
+    </div>
+    ${isOrganizer && !scored ? `
+      <div class="mt-3 d-flex align-items-center gap-2">
+        <input
+          type="number" min="0" max="${currentEvent.points_per_match}"
+          id="score-a-${match.id}"
+          class="form-control form-control-sm"
+          placeholder="Team A"
+          style="max-width:80px"
+        />
+        <span>—</span>
+        <input
+          type="number" min="0" max="${currentEvent.points_per_match}"
+          id="score-b-${match.id}"
+          class="form-control form-control-sm"
+          placeholder="Team B"
+          style="max-width:80px"
+        />
+        <button
+          class="btn btn-sm btn-sun"
+          data-submit-match="${match.id}">
+          Save
+        </button>
+      </div>
+    ` : ""}
+  `;
+
+  // Score submission
+  card.querySelector(`[data-submit-match]`)
+    ?.addEventListener("click", async (e) => {
+      const btn = e.currentTarget;
+      const scoreA = parseInt(document.querySelector(`#score-a-${match.id}`)?.value);
+      const scoreB = parseInt(document.querySelector(`#score-b-${match.id}`)?.value);
+
+      if (isNaN(scoreA) || isNaN(scoreB)) {
+        alert("Please enter both scores");
+        return;
+      }
+      if (scoreA + scoreB !== currentEvent.points_per_match) {
+        alert(`Scores must add up to ${currentEvent.points_per_match}`);
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "Saving...";
+
+      try {
+        await submitScore(match.id, scoreA, scoreB);
+        await loadRound();
+      } catch (err) {
+        alert(err.message);
+        btn.disabled = false;
+        btn.textContent = "Save";
+      }
+    });
+
+  return card;
+}
+
+// ── Next round ────────────────────────────────────────────────────────────────
+nextRoundBtn.addEventListener("click", async () => {
+  nextRoundBtn.disabled = true;
+  nextRoundBtn.textContent = "Loading...";
+
+  try {
+    currentRoundIndex++;
+    await loadRound();
+  } catch (err) {
+    alert(err.message);
+  } finally {
+    nextRoundBtn.disabled = false;
+    nextRoundBtn.textContent = "Next round →";
+  }
+});
+
+// ── Leaderboard ───────────────────────────────────────────────────────────────
+async function renderLeaderboard() {
+  const scores = await getLeaderboard(currentEvent.id);
+  const p = playerProfiles;
+
+  const sorted = Object.entries(scores)
+    .sort((a, b) => b[1].points - a[1].points);
+
+  if (sorted.length === 0) {
+    leaderboard.innerHTML = `<p class="text-muted small">No scores yet</p>`;
+    return;
+  }
+
+  leaderboard.innerHTML = `
+    <table class="table table-sm">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Player</th>
+          <th>Points</th>
+          <th>Played</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${sorted.map(([userId, data], i) => `
+          <tr ${userId === currentUser.id ? 'class="table-success"' : ""}>
+            <td>${i + 1}</td>
+            <td>${p[userId] || "Player"}</td>
+            <td><strong>${data.points}</strong></td>
+            <td>${data.played}</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
+}
+
+// ── Auto refresh every 15 seconds ─────────────────────────────────────────────
+setInterval(() => {
+  if (currentEvent?.game_status === "active") loadRound();
+}, 15000);
+
+// ── Start ─────────────────────────────────────────────────────────────────────
+init();

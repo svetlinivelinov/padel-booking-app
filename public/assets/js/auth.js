@@ -44,14 +44,26 @@ export async function getUser() {
   return data?.user || null;
 }
 
-export async function requireAuth(redirectTo = "/login.html") {
-  const user = await getUser();
-  if (!user) {
-    const currentUrl = encodeURIComponent(window.location.pathname + window.location.search);
-    window.location.href = `/login.html?redirect=${currentUrl}`;
-    return null;
-  }
-  return user;
+
+
+export async function requireAuth() {
+  // Wait for Supabase to restore session from localStorage
+  return new Promise((resolve) => {
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        resolve(session.user);
+      } else if (event === "SIGNED_OUT" || event === "INITIAL_SESSION") {
+        // No session after initial check — redirect
+        if (!session) {
+          const currentUrl = encodeURIComponent(
+            window.location.pathname + window.location.search
+          );
+          window.location.href = `/login.html?redirect=${currentUrl}`;
+          resolve(null);
+        }
+      }
+    });
+  });
 }
 
 export async function getUserRole(userId) {

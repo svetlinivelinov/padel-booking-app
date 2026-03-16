@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bokacourt — Court</title>
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+</head>
+<body>
+  <nav class="navbar px-3 py-2 d-flex justify-content-between align-items-center">
+    <span class="fw-bold brand">Bokacourt</span>
+    <div class="d-flex gap-3">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="group.html">Groups</a>
+      <a href="event.html">Events</a>
+      <a href="court.html" class="active">Court</a>
+      <a href="profile.html">Profile</a>
+      <a href="#" id="signout-link">Sign out</a>
+    </div>
+  </nav>
+
+  <div class="container py-4" style="max-width:700px">
+
+    <!-- Event selector -->
+    <div class="list-card mb-4">
+      <label class="fw-semibold mb-2 d-block">Select event</label>
+      <select id="court-event-select" class="form-select"></select>
+    </div>
+
+    <!-- Start game panel (organizer only, game not started) -->
+    <div id="start-panel" class="list-card mb-4" style="display:none">
+      <h5 class="fw-semibold mb-3">Start game</h5>
+      <div class="mb-3">
+        <label class="form-label small">Points per match</label>
+        <input
+          type="number"
+          id="points-per-match"
+          class="form-control"
+          value="16"
+          min="8"
+          max="32"
+          style="max-width:120px"
+        />
+      </div>
+      <div class="mb-3">
+        <label class="form-label small">Number of rounds</label>
+        <input
+          type="number"
+          id="total-rounds"
+          class="form-control"
+          value="6"
+          min="1"
+          max="12"
+          style="max-width:120px"
+        />
+      </div>
+      <button id="start-btn" class="btn btn-sun">Start game</button>
+      <div id="start-status" class="small text-muted mt-2"></div>
+    </div>
+
+    <!-- Active game panel -->
+    <div id="game-panel" style="display:none">
+
+      <!-- Round info -->
+      <div class="list-card mb-3 d-flex justify-content-between align-items-center">
+        <div>
+          <span class="fw-semibold" id="round-label">Round 1</span>
+          <span class="text-muted small ms-2" id="round-sub"></span>
+        </div>
+        <button id="next-round-btn" class="btn btn-sm btn-sun" style="display:none">
+          Next round →
+        </button>
+      </div>
+
+      <!-- Court cards -->
+      <div id="court-cards" class="mb-4"></div>
+
+      <!-- Leaderboard -->
+      <div class="list-card">
+        <h6 class="fw-semibold mb-3">Leaderboard</h6>
+        <div id="leaderboard"></div>
+      </div>
+
+    </div>
+
+    <!-- Waiting panel -->
+    <div id="waiting-panel" class="list-card text-center text-muted" style="display:none">
+      <p class="mb-0">Waiting for the organizer to start the game...</p>
+    </div>
+
+  </div>
+
+  <script type="module" src="assets/js/court.js"></script>
+</body>
+</html>
