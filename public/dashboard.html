@@ -19,7 +19,7 @@
       </a>
       <div class="d-flex gap-3">
         <a class="nav-link" href="/group.html">Groups</a>
-        <a class="nav-link" href="/event.html">Events</a>
+        <a class="nav-link" id="events-nav-link" href="/event.html">Events</a>
         <a class="nav-link" href="/court.html">Court</a>
         <a class="nav-link" href="/profile.html">Profile</a>
       </div>
@@ -80,6 +80,25 @@
   </script>
   <script type="module" src="/assets/js/groups.js"></script>
   <script type="module" src="/assets/js/feed.js"></script>
+  <script type="module">
+    // Update Events navbar link to include selected group
+    const groupSelect = document.getElementById("group-select");
+    const eventsNavLink = document.getElementById("events-nav-link");
+    if (groupSelect && eventsNavLink) {
+      groupSelect.addEventListener("change", () => {
+        const groupId = groupSelect.value;
+        if (groupId) {
+          eventsNavLink.href = `/event.html?group=${groupId}`;
+        } else {
+          eventsNavLink.href = "/event.html";
+        }
+      });
+      // Set initial link
+      if (groupSelect.value) {
+        eventsNavLink.href = `/event.html?group=${groupSelect.value}`;
+      }
+    }
+  </script>
 </body>
 </html>
 

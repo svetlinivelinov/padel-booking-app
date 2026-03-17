@@ -18,7 +18,7 @@ function formatDate(dateStr) {
 }
 
 // ── Render a compact event card for the dashboard feed ────────────────────────
-function renderFeedCard(event) {
+function renderFeedCard(event, selectedGroupId) {
   const { day, time } = formatDate(event.date_time);
   const max           = event.max_participants;
 
@@ -39,7 +39,7 @@ function renderFeedCard(event) {
 
   // Click anywhere on the card to go to events page for this group
   card.addEventListener("click", () => {
-    window.location.href = `/event.html?group=${event.group_id}`;
+    window.location.href = `/event.html?group=${selectedGroupId || event.group_id}`;
   });
 
   return card;
@@ -88,13 +88,13 @@ async function loadEvents(groupId) {
       <div class="empty-state">
         <div class="empty-state-title">No upcoming events</div>
         <div class="empty-state-desc">Create one from the Events page.</div>
-        <a href="/event.html" class="btn btn-sun btn-sm" style="margin-top:0.5rem;">Create event</a>
+        <a href="/event.html?group=${groupId}" class="btn btn-sun btn-sm" style="margin-top:0.5rem;">Create event</a>
       </div>`;
     return;
   }
 
   events.forEach((event) => {
-    list.appendChild(renderFeedCard(event));
+    list.appendChild(renderFeedCard(event, groupId));
   });
 }
 

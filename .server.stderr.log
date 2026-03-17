@@ -1038,3 +1038,20 @@
 ::1 - - [18/Mar/2026 00:11:04] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
 ::1 - - [18/Mar/2026 00:11:12] code 404, message File not found
 ::1 - - [18/Mar/2026 00:11:12] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [18/Mar/2026 00:30:29] "GET /event.html HTTP/1.1" 304 -
+::1 - - [18/Mar/2026 00:30:29] code 404, message File not found
+::1 - - [18/Mar/2026 00:30:29] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [18/Mar/2026 00:30:29] "GET /assets/js/env.js HTTP/1.1" 304 -
+::1 - - [18/Mar/2026 00:30:29] "GET /assets/css/style.css HTTP/1.1" 200 -
+::1 - - [18/Mar/2026 00:30:30] "GET /assets/js/auth.js HTTP/1.1" 304 -
+::1 - - [18/Mar/2026 00:30:30] "GET /assets/js/events.js HTTP/1.1" 200 -
+::1 - - [18/Mar/2026 00:33:28] code 404, message File not found
+::1 - - [18/Mar/2026 00:33:28] "GET /assets/css/style.css HTTP/1.1" 304 -
+::1 - - [18/Mar/2026 00:33:29] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [18/Mar/2026 00:33:29] "GET /assets/js/events.js HTTP/1.1" 304 -
+::1 - - [18/Mar/2026 00:33:33] "GET /group.html HTTP/1.1" 304 -
+::1 - - [18/Mar/2026 00:33:33] code 404, message File not found
+::1 - - [18/Mar/2026 00:33:33] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [18/Mar/2026 00:33:34] "GET /dashboard.html HTTP/1.1" 304 -
+::1 - - [18/Mar/2026 00:33:34] code 404, message File not found
+::1 - - [18/Mar/2026 00:33:34] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
