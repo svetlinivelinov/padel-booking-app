@@ -6,33 +6,33 @@
   <title>Bokacourt — Court</title>
   <link rel="stylesheet" href="assets/css/style.css" />
   <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Playfair+Display:wght@700&display=swap"
     rel="stylesheet"
   />
 </head>
 <body>
-  <nav class="navbar px-3 py-2 d-flex justify-content-between align-items-center">
+  <nav class="navbar px-3 py-2 d-flex justify-content-between align-items-center glass-nav">
     <span class="fw-bold brand">Bokacourt</span>
     <div class="d-flex gap-3">
-      <a href="dashboard.html">Dashboard</a>
-      <a href="group.html">Groups</a>
-      <a href="event.html">Events</a>
-      <a href="court.html" class="active">Court</a>
-      <a href="profile.html">Profile</a>
-      <a href="#" id="signout-link">Sign out</a>
+      <a href="dashboard.html" class="nav-link">Dashboard</a>
+      <a href="group.html" class="nav-link">Groups</a>
+      <a href="event.html" class="nav-link">Events</a>
+      <a href="court.html" class="nav-link active">Court</a>
+      <a href="profile.html" class="nav-link">Profile</a>
+      <a href="#" id="signout-link" class="nav-link">Sign out</a>
     </div>
   </nav>
 
   <div class="container py-4" style="max-width:700px">
 
     <!-- Event selector -->
-    <div class="list-card mb-4">
+    <div class="list-card mb-4 frosted-card">
       <label class="fw-semibold mb-2 d-block">Select event</label>
       <select id="court-event-select" class="form-select"></select>
     </div>
 
     <!-- Start game panel (organizer only, game not started) -->
-    <div id="start-panel" class="list-card mb-4" style="display:none">
+    <div id="start-panel" class="list-card mb-4 frosted-card" style="display:none">
       <h5 class="fw-semibold mb-3">Start game</h5>
       <div class="mb-3">
         <label class="form-label small">Points per match</label>
@@ -58,7 +58,7 @@
           style="max-width:120px"
         />
       </div>
-      <button id="start-btn" class="btn btn-sun">Start game</button>
+      <button id="start-btn" class="btn btn-primary cta-btn">Start game</button>
       <div id="start-status" class="small text-muted mt-2"></div>
     </div>
 
@@ -66,12 +66,12 @@
     <div id="game-panel" style="display:none">
 
       <!-- Round info -->
-      <div class="list-card mb-3 d-flex justify-content-between align-items-center">
+      <div class="list-card mb-3 d-flex justify-content-between align-items-center frosted-card">
         <div>
           <span class="fw-semibold" id="round-label">Round 1</span>
           <span class="text-muted small ms-2" id="round-sub"></span>
         </div>
-        <button id="next-round-btn" class="btn btn-sm btn-sun" style="display:none">
+        <button id="next-round-btn" class="btn btn-sm btn-primary cta-btn" style="display:none">
           Next round →
         </button>
       </div>
@@ -80,7 +80,7 @@
       <div id="court-cards" class="mb-4"></div>
 
       <!-- Leaderboard -->
-      <div class="list-card">
+      <div class="list-card frosted-card">
         <h6 class="fw-semibold mb-3">Leaderboard</h6>
         <div id="leaderboard"></div>
       </div>
@@ -88,7 +88,7 @@
     </div>
 
     <!-- Waiting panel -->
-    <div id="waiting-panel" class="list-card text-center text-muted" style="display:none">
+    <div id="waiting-panel" class="list-card text-center text-muted frosted-card" style="display:none">
       <p class="mb-0">Waiting for the organizer to start the game...</p>
     </div>
 
