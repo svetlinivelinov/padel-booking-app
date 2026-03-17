@@ -1,0 +1,13 @@
+[build]
+  command = "printf \"window.SUPABASE_URL='%s';\\nwindow.SUPABASE_ANON_KEY='%s';\\n\" \"$SUPABASE_URL\" \"$SUPABASE_ANON_KEY\" > public/assets/js/env.js"
+  publish = "public"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "DENY"

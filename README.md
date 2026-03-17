@@ -22,10 +22,11 @@ A vanilla JS + Supabase scaffold for the Bokacourt flow described in the archite
 1) Set Netlify environment variables:
 	- SUPABASE_URL
 	- SUPABASE_ANON_KEY
-2) Build command:
-	echo "window.SUPABASE_URL='$SUPABASE_URL'; window.SUPABASE_ANON_KEY='$SUPABASE_ANON_KEY';" > public/assets/js/env.js
-3) Publish directory: public
-4) In Supabase Auth settings, add your Netlify site URL to Site URL and add redirect URLs for your domain.
+2) This repository includes `netlify.toml` with:
+	- Build command that injects those variables into `public/assets/js/env.js`
+	- Publish directory set to `public`
+3) In Supabase Auth settings, add your Netlify site URL to Site URL and add redirect URLs for your domain.
+4) Trigger a deploy from Netlify (or connect the Git repository for automatic deploys).
 
 ## Automatic Supabase Migrations (GitHub Actions)
 1) The workflow file is at .github/workflows/supabase-migrations.yml.
