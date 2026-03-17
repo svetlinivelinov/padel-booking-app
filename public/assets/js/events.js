@@ -34,6 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 let editingEventId = null;
+let refreshVersion = 0;
 window.refreshEvents = refreshEvents;
 
 // ── Render a single event card ────────────────────────────────────────────────
@@ -224,10 +225,14 @@ async function renderEventCard(event, userId) {
 
 // ── Refresh event list ────────────────────────────────────────────────────────
 export async function refreshEvents() {
+  const currentVersion = ++refreshVersion;
   if (!list || !groupSelect || !groupSelect.value) return;
 
   const userId = await getCurrentUserId();
+  if (currentVersion !== refreshVersion) return;
+
   const events = await listGroupEvents(groupSelect.value);
+  if (currentVersion !== refreshVersion) return;
 
   list.innerHTML = "";
 
@@ -237,7 +242,9 @@ export async function refreshEvents() {
   }
 
   for (const event of events) {
+    if (currentVersion !== refreshVersion) return;
     const card = await renderEventCard(event, userId);
+    if (currentVersion !== refreshVersion) return;
     list.appendChild(card);
   }
 }
