@@ -1,15 +1,21 @@
 import { supabase } from "./config.js";
 
-export async function signUp({ email, password, profile }) {
+export async function signUp({ email, password, profile, emailRedirectTo }) {
+  const options = {
+    data: {
+      display_name: profile?.display_name || "",
+      username: profile?.username || ""
+    }
+  };
+
+  if (emailRedirectTo) {
+    options.emailRedirectTo = emailRedirectTo;
+  }
+
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: {
-      data: {
-        display_name: profile?.display_name || "",
-        username: profile?.username || ""
-      }
-    }
+    options
   });
 
   if (error) {

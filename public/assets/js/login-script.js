@@ -2,6 +2,45 @@ import { signIn, signUp } from "./auth.js";
 
 const loginForm = document.querySelector("#login-form");
 const signupForm = document.querySelector("#signup-form");
+const params = new URLSearchParams(window.location.search);
+const redirect = params.get("redirect");
+
+function toSafeRedirectPath(rawRedirect) {
+  if (!rawRedirect) return "";
+
+  let decoded = rawRedirect;
+  try {
+    decoded = decodeURIComponent(rawRedirect);
+  } catch {
+    decoded = rawRedirect;
+  }
+
+  if (!decoded.startsWith("/") || decoded.startsWith("//")) {
+    return "";
+  }
+
+  return decoded;
+}
+
+const redirectPath = toSafeRedirectPath(redirect);
+
+function withRedirect(path) {
+  if (!redirectPath) return path;
+  const separator = path.includes("?") ? "&" : "?";
+  return `${path}${separator}redirect=${encodeURIComponent(redirectPath)}`;
+}
+
+function hydrateAuthLinks() {
+  document.querySelectorAll('a[href="/signup.html"]').forEach((link) => {
+    link.setAttribute("href", withRedirect("/signup.html"));
+  });
+
+  document.querySelectorAll('a[href="/login.html"]').forEach((link) => {
+    link.setAttribute("href", withRedirect("/login.html"));
+  });
+}
+
+hydrateAuthLinks();
 
 async function handleLogin(event) {
   event.preventDefault();
@@ -12,9 +51,7 @@ async function handleLogin(event) {
   status.textContent = "Signing in...";
   try {
     await signIn(email, password);
-    const params = new URLSearchParams(window.location.search);
-    const redirect = params.get("redirect");
-    window.location.href = redirect ? decodeURIComponent(redirect) : "/dashboard.html";
+    window.location.href = redirectPath || "/dashboard.html";
   } catch (error) {
     status.textContent = error.message;
   }
@@ -41,12 +78,23 @@ async function handleSignup(event) {
 
   status.textContent = "Creating account...";
   try {
-    await signUp({
+    const loginPath = redirectPath
+      ? `/login.html?redirect=${encodeURIComponent(redirectPath)}`
+      : "/login.html";
+
+    const signUpResult = await signUp({
       email,
       password,
-      profile: { display_name: displayName, username }
+      profile: { display_name: displayName, username },
+      emailRedirectTo: `${window.location.origin}${loginPath}`
     });
-    status.textContent = "Check your email to confirm, then sign in.";
+
+    if (signUpResult?.session) {
+      window.location.href = redirectPath || "/dashboard.html";
+      return;
+    }
+
+    status.textContent = "Check your email to confirm, then sign in. Your invite link will be kept.";
   } catch (error) {
     status.textContent = error.message;
   }
