@@ -22,7 +22,13 @@ function toSafeRedirectPath(rawRedirect) {
   return decoded;
 }
 
-const redirectPath = toSafeRedirectPath(redirect);
+const queryRedirectPath = toSafeRedirectPath(redirect);
+const storedRedirectPath = toSafeRedirectPath(sessionStorage.getItem("postAuthRedirect") || "");
+const redirectPath = queryRedirectPath || storedRedirectPath;
+
+if (queryRedirectPath) {
+  sessionStorage.setItem("postAuthRedirect", queryRedirectPath);
+}
 
 function withRedirect(path) {
   if (!redirectPath) return path;
@@ -51,6 +57,9 @@ async function handleLogin(event) {
   status.textContent = "Signing in...";
   try {
     await signIn(email, password);
+    if (redirectPath) {
+      sessionStorage.removeItem("postAuthRedirect");
+    }
     window.location.href = redirectPath || "/dashboard.html";
   } catch (error) {
     status.textContent = error.message;
@@ -90,6 +99,9 @@ async function handleSignup(event) {
     });
 
     if (signUpResult?.session) {
+      if (redirectPath) {
+        sessionStorage.removeItem("postAuthRedirect");
+      }
       window.location.href = redirectPath || "/dashboard.html";
       return;
     }

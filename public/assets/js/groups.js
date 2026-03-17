@@ -25,9 +25,9 @@ const setStatus = (msg) => { if (status) status.textContent = msg; };
     const user = await requireAuth();
 
     if (!user) {
-      window.location.href = `/login.html?redirect=${encodeURIComponent(
-        `/group.html?invite=${invite}`
-      )}`;
+      const inviteRedirect = `/group.html?invite=${invite}`;
+      sessionStorage.setItem("postAuthRedirect", inviteRedirect);
+      window.location.href = `/signup.html?redirect=${encodeURIComponent(inviteRedirect)}`;
       return;
     }
 
