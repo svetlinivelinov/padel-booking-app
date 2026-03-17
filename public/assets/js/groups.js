@@ -157,6 +157,11 @@ export async function refreshGroups() {
   }
 
   // ── Group select dropdowns ──
+  // Prefer a `group` URL param when setting the selected option so
+  // navigating from dashboard with `?group=...` keeps the selection.
+  const params = new URLSearchParams(window.location.search);
+  const requestedGroup = params.get("group");
+
   ["#group-select", "#event-group"].forEach((selector) => {
     const select = document.querySelector(selector);
     if (!select) return;
@@ -175,7 +180,12 @@ export async function refreshGroups() {
       select.appendChild(option);
     });
 
-    if (!select.value) select.value = groups[0].id;
+    // If a valid group id was requested via URL, use it; otherwise fall back to the first group
+    if (requestedGroup && groups.find(g => g.id === requestedGroup)) {
+      select.value = requestedGroup;
+    } else {
+      select.value = groups[0].id;
+    }
 
     if (selector === "#event-group" && typeof window.refreshEvents === "function") {
       window.refreshEvents();
