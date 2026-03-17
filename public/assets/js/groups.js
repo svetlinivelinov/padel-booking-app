@@ -4,7 +4,6 @@ import {
   addGroupMember,
   joinGroupByToken,
   listMyGroups,
-  regenerateInviteToken,
 } from "./database.js";
 
 const createForm = document.querySelector("#group-create-form");
@@ -120,11 +119,6 @@ export async function refreshGroups() {
                 Copy token
               </button>
             ` : ""}
-            ${isOwner ? `
-              <button class="btn btn-sm btn-outline-warning" data-regenerate>
-                Regenerate token
-              </button>
-            ` : ""}
           </div>
         </div>
         ${group.invite_token ? `
@@ -155,21 +149,6 @@ export async function refreshGroups() {
           setTimeout(() => {
             if (btn) btn.textContent = "Copy token";
           }, 1500);
-        }
-      });
-
-      // Regenerate token (owner only)
-      item.querySelector("[data-regenerate]")?.addEventListener("click", async (e) => {
-        const btn = e.currentTarget;
-        btn.disabled = true;
-        btn.textContent = "Regenerating...";
-        try {
-          await regenerateInviteToken(group.id);
-          await refreshGroups();
-        } catch (err) {
-          alert("Failed to regenerate token: " + err.message);
-          btn.disabled = false;
-          btn.textContent = "Regenerate token";
         }
       });
 

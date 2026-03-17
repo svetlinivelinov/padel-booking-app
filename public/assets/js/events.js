@@ -3,7 +3,7 @@ import { requireAuth } from "./auth.js";
 // Auto-refresh every 10 seconds
 setInterval(() => {
   if (!document.hidden) refreshEvents();
-}, 10000);
+}, 30000);
 
 import {
   createEvent,
