@@ -72,8 +72,15 @@ async function loadGroups() {
     option.textContent = group.name;
     select.appendChild(option);
   });
-
-  await loadEvents(groups[0].id);
+  // Ensure first group is selected and update Events navbar link immediately
+  if (groups[0] && select) {
+    select.value = groups[0].id;
+    const eventsNav = document.getElementById("events-nav-link");
+    if (eventsNav) eventsNav.href = `/event.html?group=${groups[0].id}`;
+    await loadEvents(groups[0].id);
+  } else {
+    await loadEvents(groups[0]?.id);
+  }
 }
 
 // ── Load events for selected group ───────────────────────────────────────────
