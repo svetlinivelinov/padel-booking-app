@@ -20,14 +20,12 @@ let currentUser = null;
 let allRounds = [];
 let currentRoundIndex = 0;
 let playerProfiles = {};
-let availableEvents = [];
 
 // ── Elements ──────────────────────────────────────────────────────────────────
 const eventSelect    = document.querySelector("#court-event-select");
 const startPanel     = document.querySelector("#start-panel");
 const gamePanel      = document.querySelector("#game-panel");
-const emptyPanel     = document.querySelector("#empty-panel");
-const emptyNextEvent = document.querySelector("#empty-next-event");
+const waitingPanel   = document.querySelector("#waiting-panel");
 const startBtn       = document.querySelector("#start-btn");
 const startStatus    = document.querySelector("#start-status");
 const roundLabel     = document.querySelector("#round-label");
@@ -43,11 +41,7 @@ async function init() {
 
   await loadEventOptions();
   eventSelect.addEventListener("change", () => loadCourt());
-  if (eventSelect.value) {
-    loadCourt();
-  } else {
-    showEmptyState();
-  }
+  if (eventSelect.value) loadCourt();
 }
 
 // ── Load event dropdown ───────────────────────────────────────────────────────
@@ -59,9 +53,6 @@ async function loadEventOptions() {
     const events = await listGroupEvents(group.id);
     events.forEach(e => allEvents.push({ ...e, groupName: group.name }));
   }
-
-  allEvents.sort((a, b) => new Date(a.date_time) - new Date(b.date_time));
-  availableEvents = allEvents;
 
   eventSelect.innerHTML = allEvents.length === 0
     ? `<option value="">No events found</option>`
@@ -75,17 +66,12 @@ async function loadEventOptions() {
   const params = new URLSearchParams(window.location.search);
   const eventId = params.get("event");
   if (eventId) eventSelect.value = eventId;
-
-  updateNextEventLabel();
 }
 
 // ── Load court for selected event ─────────────────────────────────────────────
 async function loadCourt() {
   const eventId = eventSelect.value;
-  if (!eventId) {
-    showEmptyState();
-    return;
-  }
+  if (!eventId) return;
 
   currentEvent = await getEvent(eventId);
   if (!currentEvent) return;
@@ -104,34 +90,16 @@ async function loadCourt() {
 
   startPanel.style.display   = "none";
   gamePanel.style.display    = "none";
-  if (emptyPanel) emptyPanel.style.display = "none";
+  waitingPanel.style.display = "none";
 
   if (!gameStarted && isOrganizer) {
     startPanel.style.display = "block";
-    showEmptyState();
   } else if (gameStarted) {
     gamePanel.style.display = "block";
     await loadRound();
   } else {
-    showEmptyState();
+    waitingPanel.style.display = "block";
   }
-}
-
-function updateNextEventLabel() {
-  if (!emptyNextEvent) return;
-  if (!availableEvents.length) {
-    emptyNextEvent.textContent = "No scheduled events";
-    return;
-  }
-
-  const now = new Date();
-  const next = availableEvents.find(e => new Date(e.date_time) >= now) || availableEvents[0];
-  emptyNextEvent.textContent = new Date(next.date_time).toLocaleString();
-}
-
-function showEmptyState() {
-  updateNextEventLabel();
-  if (emptyPanel) emptyPanel.style.display = "block";
 }
 
 // ── Start game ────────────────────────────────────────────────────────────────

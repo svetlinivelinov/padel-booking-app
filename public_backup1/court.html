@@ -23,7 +23,6 @@
     </div>
   </nav>
 
-  <main class="app-container">
   <section class="py-5">
     <div class="container mb-2">
       <h1 class="page-title">Court</h1>
@@ -95,17 +94,13 @@
 
     </div>
 
-    <!-- Empty state panel -->
-    <div id="empty-panel" class="list-card frosted-card court-empty-state" style="display:none">
-      <div class="court-empty-icon">[]</div>
-      <h5 class="mb-2">No active game right now</h5>
-      <p class="mb-2 text-muted">Pick an event to check its current court status.</p>
-      <p class="mb-0"><strong>Next event:</strong> <span id="empty-next-event">TBD</span></p>
+    <!-- Waiting panel -->
+    <div id="waiting-panel" class="list-card text-center text-muted frosted-card" style="display:none">
+      <p class="mb-0">Waiting for the organizer to start the game...</p>
     </div>
 
   </div>
   </section>
-  </main>
 
   <script src="/assets/js/env.js"></script>
   <script type="module" src="/assets/js/court.js"></script>

@@ -23,19 +23,13 @@
     </div>
   </nav>
 
-  <main class="app-container">
   <section class="py-5">
     <div class="container mb-2">
       <h1 class="page-title">Groups</h1>
       <p class="page-subtitle">Create or join a padel group</p>
     </div>
     <div class="container">
-      <div class="groups-heading">
-        <h4 class="section-title">Your groups</h4>
-        <div id="group-list" class="mt-3"></div>
-      </div>
-
-      <div class="row g-4 mt-1">
+      <div class="row g-4">
         <div class="col-lg-6">
           <div class="hero-card">
             <h3 class="section-title">Create a group</h3>
@@ -49,7 +43,7 @@
                 <textarea class="form-control" id="group-description" rows="2"></textarea>
               </div>
               <div class="page-actions">
-                <button class="btn btn-sun" type="submit"><span class="btn-icon">+</span>Create</button>
+                <button class="btn btn-sun" type="submit">Create</button>
               </div>
             </form>
           </div>
@@ -63,16 +57,20 @@
                 <input class="form-control" id="group-token" type="text" required>
               </div>
               <div class="page-actions">
-                <button class="btn btn-outline-danger btn-ghost-danger" type="submit"><span class="btn-icon">#</span>Join</button>
+                <button class="btn btn-sun" type="submit">Join</button>
               </div>
             </form>
             <p id="group-status" class="form-status mt-3"></p>
           </div>
         </div>
       </div>
+
+      <div class="mt-4">
+        <h4 class="section-title">Your groups</h4>
+        <div id="group-list" class="mt-3"></div>
+      </div>
     </div>
   </section>
-  </main>
 
   <script src="/assets/js/env.js"></script>
   <script type="module" src="/assets/js/groups.js"></script>

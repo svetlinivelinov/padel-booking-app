@@ -36,20 +36,6 @@ function formatDate(dateStr) {
   }
 }
 
-function toLocalDatetimeString(isoString) {
-  try {
-    const d = new Date(isoString);
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    const hours = String(d.getHours()).padStart(2, "0");
-    const minutes = String(d.getMinutes()).padStart(2, "0");
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
-  } catch {
-    return "";
-  }
-}
-
 function initials(name) {
   if (!name) return "?";
   return name.trim().split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
@@ -222,7 +208,7 @@ async function renderEventCard(event, userId) {
     if (!eventData) return;
     editingEventId        = event.id;
     groupSelect.value     = eventData.group_id;
-    form.querySelector("#event-date").value = toLocalDatetimeString(eventData.date_time);
+    form.querySelector("#event-date").value = eventData.date_time.slice(0, 16);
     form.querySelector("#event-max").value  = eventData.max_participants;
     form.querySelector("#event-desc").value = eventData.description;
     form.querySelector("#event-type").value = eventData.type;
