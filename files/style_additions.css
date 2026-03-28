@@ -1,0 +1,144 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   ДОБАВИ В КРАЯ НА style.css
+   Final screen, Results by Groups, Finalize button
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Finalize button pulse ───────────────────────────────────────────────────── */
+.btn-pulse {
+  animation: pulse-glow 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4); }
+  50%       { box-shadow: 0 0 0 8px rgba(220, 53, 69, 0); }
+}
+
+/* ── Final / Summary screen ──────────────────────────────────────────────────── */
+.final-screen {
+  text-align: center;
+}
+
+.final-header {
+  padding: 1.5rem 0 1rem;
+}
+
+.final-trophy {
+  font-size: 3.5rem;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.final-winner-block {
+  background: linear-gradient(135deg, #fef9c3 0%, #fde68a 100%);
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
+  margin: 1rem 0;
+}
+
+.final-winner-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #92400e;
+  margin-bottom: 0.25rem;
+}
+
+.final-winner-name {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #78350f;
+  line-height: 1.1;
+}
+
+.final-winner-pts {
+  font-size: 0.9rem;
+  color: #92400e;
+  margin-top: 0.25rem;
+}
+
+.final-podium {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 1.25rem 0;
+}
+
+.final-podium-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--bs-gray-100, #f8f9fa);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  min-width: 100px;
+  border: 2px solid transparent;
+}
+
+.final-podium-item.final-podium-me {
+  border-color: #22c55e;
+  background: #f0fdf4;
+}
+
+.final-medal {
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.final-player-name {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.final-player-pts {
+  font-size: 0.75rem;
+  color: var(--bs-secondary, #6c757d);
+  margin-top: 0.1rem;
+}
+
+/* ── Results by Groups page ──────────────────────────────────────────────────── */
+.results-group-section {
+  /* wrapper per group */
+}
+
+.results-group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.results-group-name {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.results-event-block {
+  background: var(--bs-white, #fff);
+  border: 1px solid var(--bs-border-color, #dee2e6);
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+}
+
+.results-event-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.results-winner-row {
+  font-size: 0.92rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+  margin-bottom: 0.25rem;
+}
+
+.results-table th,
+.results-table td {
+  font-size: 0.85rem;
+  vertical-align: middle;
+}
