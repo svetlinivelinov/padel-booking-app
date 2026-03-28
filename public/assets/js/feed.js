@@ -100,9 +100,31 @@ async function loadEvents(groupId) {
     return;
   }
 
-  events.forEach((event) => {
-    list.appendChild(renderFeedCard(event, groupId));
-  });
+  const now      = Date.now();
+  const upcoming = events.filter(e => new Date(e.date_time).getTime() >= now);
+  const past     = events.filter(e => new Date(e.date_time).getTime() <  now);
+
+  if (upcoming.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "empty-state";
+    empty.innerHTML = `<div class="empty-state-title">No upcoming events</div>
+      <div class="empty-state-desc">Create one from the Events page.</div>`;
+    list.appendChild(empty);
+  } else {
+    upcoming.forEach(event => list.appendChild(renderFeedCard(event, groupId)));
+  }
+
+  if (past.length > 0) {
+    const pastSection = document.createElement("details");
+    pastSection.className = "past-events-section mt-3";
+    pastSection.innerHTML = `<summary class="past-events-summary">Past events (${past.length})</summary>`;
+    past.forEach(event => {
+      const card = renderFeedCard(event, groupId);
+      card.classList.add("past-event-card");
+      pastSection.appendChild(card);
+    });
+    list.appendChild(pastSection);
+  }
 }
 
 // ── Listeners ─────────────────────────────────────────────────────────────────
