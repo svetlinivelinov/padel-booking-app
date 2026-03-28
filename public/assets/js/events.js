@@ -132,14 +132,16 @@ async function renderEventCard(event, userId) {
       }).join("")}
     </div>` : "";
 
+  const isOrganizer = event.created_by === userId;
+
   // Action buttons — join or leave
   const actionsHTML = myParticipation ? `
     <button class="btn btn-ghost btn-sm" data-leave-id="${event.id}">Leave</button>
-    <button class="btn btn-ghost btn-sm" data-edit-id="${event.id}">Edit</button>
+    ${isOrganizer ? `<button class="btn btn-ghost btn-sm" data-edit-id="${event.id}">Edit</button>` : ""}
   ` : `
     ${isCouples ? `<input type="text" class="form-control" id="partner-${event.id}" placeholder="Partner name" style="max-width:180px;">` : ""}
     <button class="btn btn-sun" data-join-id="${event.id}">${isFull ? "Join waitlist" : "Join"}</button>
-    <button class="btn btn-ghost btn-sm" data-edit-id="${event.id}">Edit</button>
+    ${isOrganizer ? `<button class="btn btn-ghost btn-sm" data-edit-id="${event.id}">Edit</button>` : ""}
   `;
 
   // ── Assemble card ──
@@ -151,9 +153,11 @@ async function renderEventCard(event, userId) {
         <div class="event-label">${event.description || "Event"}</div>
         <div class="event-time">${time}</div>
         <div class="event-meta">${day} · max ${event.max_participants}</div>
+        ${event.location ? `<div class="event-meta" style="margin-top:0.2rem;">📍 ${event.location}</div>` : ""}
       </div>
       <span class="${chipClass}">${chipText}</span>
     </div>
+    ${event.notes ? `<div class="text-muted" style="font-size:0.82rem;margin-bottom:0.5rem;">📝 ${event.notes}</div>` : ""}
 
     ${statusChipHTML ? `<div style="margin-bottom:0.75rem;">${statusChipHTML}</div>` : ""}
 
@@ -217,17 +221,20 @@ async function renderEventCard(event, userId) {
   });
 
   // Wire edit
-  item.querySelector("[data-edit-id]")?.addEventListener("click", async () => {
-    const eventData = await getEvent(event.id);
-    if (!eventData) return;
+  item.querySelector("[data-edit-id]")?.addEventListener("click", () => {
     editingEventId        = event.id;
-    groupSelect.value     = eventData.group_id;
-    form.querySelector("#event-date").value = toLocalDatetimeString(eventData.date_time);
-    form.querySelector("#event-max").value  = eventData.max_participants;
-    form.querySelector("#event-desc").value = eventData.description;
-    form.querySelector("#event-type").value = eventData.type;
+    groupSelect.value     = event.group_id;
+    form.querySelector("#event-date").value = toLocalDatetimeString(event.date_time);
+    form.querySelector("#event-max").value  = event.max_participants;
+    form.querySelector("#event-desc").value = event.description || "";
+    form.querySelector("#event-type").value = event.type;
+    if (form.querySelector("#event-location")) form.querySelector("#event-location").value = event.location || "";
+    if (form.querySelector("#event-notes")) form.querySelector("#event-notes").value = event.notes || "";
     setStatus("Editing event — make changes and save.");
     form.querySelector("button[type='submit']").textContent = "Update event";
+    // Open the details/toggle if collapsed
+    const toggle = form.closest("details");
+    if (toggle) toggle.open = true;
     form.scrollIntoView({ behavior: "smooth" });
   });
 
@@ -256,11 +263,40 @@ export async function refreshEvents() {
     return;
   }
 
-  for (const event of events) {
+  const now = Date.now();
+  const upcoming = events.filter(e => new Date(e.date_time).getTime() >= now);
+  const past     = events.filter(e => new Date(e.date_time).getTime() <  now);
+
+  // Render upcoming events
+  for (const event of upcoming) {
     if (currentVersion !== refreshVersion) return;
     const card = await renderEventCard(event, userId);
     if (currentVersion !== refreshVersion) return;
     list.appendChild(card);
+  }
+
+  if (upcoming.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "empty-state";
+    empty.innerHTML = `<div class="empty-state-title">No upcoming events</div>
+      <div class="empty-state-desc">Create one using the form above.</div>`;
+    list.appendChild(empty);
+  }
+
+  // Render past events in a collapsed section
+  if (past.length > 0) {
+    const pastSection = document.createElement("details");
+    pastSection.className = "past-events-section mt-3";
+    pastSection.innerHTML = `<summary class="past-events-summary">Past events (${past.length})</summary>`;
+
+    for (const event of past) {
+      if (currentVersion !== refreshVersion) return;
+      const card = await renderEventCard(event, userId);
+      card.classList.add("past-event-card");
+      if (currentVersion !== refreshVersion) return;
+      pastSection.appendChild(card);
+    }
+    list.appendChild(pastSection);
   }
 }
 
@@ -279,6 +315,8 @@ async function handleCreate(e) {
   const eventType       = form.querySelector("#event-type").value;
   const maxParticipants = Number(form.querySelector("#event-max").value);
   const eventDate       = new Date(dateValue);
+  // Convert local time to UTC ISO string so Supabase stores the correct moment
+  if (!Number.isNaN(eventDate.getTime())) dateValue = eventDate.toISOString();
 
   if (!Number.isInteger(maxParticipants) || maxParticipants < 2) {
     setStatus("Max participants must be at least 2."); btn.disabled = false; return;
@@ -289,7 +327,7 @@ async function handleCreate(e) {
   if (!dateValue || Number.isNaN(eventDate.getTime())) {
     setStatus("Please provide a valid date and time."); btn.disabled = false; return;
   }
-  if (eventDate <= new Date()) {
+  if (!editingEventId && eventDate <= new Date()) {
     setStatus("Event date must be in the future."); btn.disabled = false; return;
   }
 
@@ -299,6 +337,8 @@ async function handleCreate(e) {
     max_participants: maxParticipants,
     description:      form.querySelector("#event-desc").value.trim(),
     type:             eventType,
+    location:         form.querySelector("#event-location")?.value.trim() || null,
+    notes:            form.querySelector("#event-notes")?.value.trim() || null,
   };
 
   try {
@@ -311,7 +351,9 @@ async function handleCreate(e) {
       await createEvent({ ...payload, created_by: user.id });
       setStatus("Event created.");
     }
+    const savedGroup = groupSelect.value;
     form.reset();
+    groupSelect.value = savedGroup;
     await refreshEvents();
   } catch (err) {
     setStatus(err.message);

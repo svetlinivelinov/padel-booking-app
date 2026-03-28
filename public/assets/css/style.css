@@ -1,12 +1,12 @@
-/* ═══════════════════════════════════════════════════════
-   BOKACOURT — style.css
-   Dark Padel — Luxury UI
-   ═══════════════════════════════════════════════════════
+/* -------------------------------------------------------
+   BOKACOURT � style.css
+   Dark Padel � Luxury UI
+   -------------------------------------------------------
    To change the entire theme, edit only the :root block.
-   All components reference tokens — zero hardcoded values.
-   ═══════════════════════════════════════════════════════ */
+   All components reference tokens � zero hardcoded values.
+   ------------------------------------------------------- */
 
-/* ── TOKENS ─────────────────────────────────────────── */
+/* -- TOKENS ------------------------------------------- */
 :root {
   /* Background */
   --bg-base:             #020617;
@@ -26,20 +26,20 @@
   --border-input:  #17365d;
   --border-strong: rgba(255, 255, 255, 0.12);
 
-  /* Accent — blue */
-  --accent:        #316a70;
-  --accent-strong: #28585d;
-  --accent-light:  #6f9ca1;
-  --accent-glow:   rgba(49, 106, 112, 0.24);
-  --accent-bg:     rgba(49, 106, 112, 0.14);
+  /* Accent � blue */
+  --accent:        #2d6bbf;
+  --accent-strong: #1f52a0;
+  --accent-light:  #6a9fd4;
+  --accent-glow:   rgba(45, 107, 191, 0.24);
+  --accent-bg:     rgba(45, 107, 191, 0.14);
 
-  /* Lime — active / highlight */
+  /* Lime � active / highlight */
   --lime:          #c8cc50;
   --lime-dim:      #a0a830;
   --lime-bg:       rgba(200, 204, 80, 0.12);
   --lime-border:   rgba(200, 204, 80, 0.30);
 
-  /* Shine — glass edge highlight */
+  /* Shine � glass edge highlight */
   --shine:         rgba(130, 170, 255, 0.35);
   --shine-bright:  rgba(180, 210, 255, 0.60);
 
@@ -66,10 +66,10 @@
   /* Shadows */
   --shadow-card: 0 10px 25px rgba(0,0,0,0.35);
   --shadow-card-hover: 0 14px 32px rgba(0,0,0,0.40);
-  --shadow-btn:  0 2px 12px rgba(49, 106, 112, 0.14);
+  --shadow-btn:  0 2px 12px var(--accent-bg);
 }
 
-/* ── RESET & BASE ────────────────────────────────────── */
+/* -- RESET & BASE -------------------------------------- */
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -111,7 +111,7 @@ a:hover {
   color: var(--text-primary);
 }
 
-/* ── TYPOGRAPHY ─────────────────────────────────────── */
+/* -- TYPOGRAPHY --------------------------------------- */
 h1, h2, h3, h4, h5, h6 {
   color: var(--text-primary);
   font-weight: 700;
@@ -127,7 +127,7 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text-primary);
 }
 
-/* Page hero title — used on dashboard */
+/* Page hero title � used on dashboard */
 .page-title {
   font-size: 2rem;
   font-weight: 800;
@@ -146,7 +146,7 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 0.75rem;
 }
 
-/* ── NAVBAR ─────────────────────────────────────────── */
+/* -- NAVBAR ------------------------------------------- */
 .navbar {
   position: sticky;
   top: 0;
@@ -229,7 +229,7 @@ h1, h2, h3, h4, h5, h6 {
   height: 2px;
   border-radius: 999px;
   background: var(--accent);
-  box-shadow: 0 0 10px rgba(49, 106, 112, 0.35);
+  box-shadow: 0 0 10px rgba(45, 107, 191, 0.35);
   opacity: 1;
 }
 
@@ -237,7 +237,7 @@ h1, h2, h3, h4, h5, h6 {
 .btn-nav-cta {
   background: var(--accent);
   color: #fff;
-  border: 1px solid rgba(49, 106, 112, 0.3);
+  border: 1px solid rgba(45, 107, 191, 0.3);
   border-radius: var(--radius-btn);
   padding: 0.45rem 1rem;
   font-size: 0.82rem;
@@ -259,7 +259,7 @@ h1, h2, h3, h4, h5, h6 {
   color: #fff;
 }
 
-/* ── CARDS ───────────────────────────────────────────── */
+/* -- CARDS --------------------------------------------- */
 .hero-card,
 .card-soft,
 .list-card,
@@ -341,7 +341,7 @@ h1, h2, h3, h4, h5, h6 {
   transform: translateY(-1px);
 }
 
-/* Event card accent bar — lime top line */
+/* Event card accent bar � lime top line */
 .event-card {
   border-top: 2px solid transparent;
   background-image:
@@ -351,7 +351,7 @@ h1, h2, h3, h4, h5, h6 {
   background-clip: padding-box, border-box;
 }
 
-/* ── FORMS ───────────────────────────────────────────── */
+/* -- FORMS --------------------------------------------- */
 .form-label {
   font-size: 0.72rem;
   font-weight: 600;
@@ -382,12 +382,16 @@ h1, h2, h3, h4, h5, h6 {
   border-color: var(--accent);
   background: var(--bg-input);
   color: var(--text-primary);
-  box-shadow: 0 0 0 2px rgba(49, 106, 112, 0.2);
+  box-shadow: 0 0 0 2px rgba(45, 107, 191, 0.2);
 }
 
 .form-control::placeholder {
   color: #6b8bb3;
   opacity: 1;
+}
+
+input[type="datetime-local"].form-control {
+  color-scheme: dark;
 }
 
 .event-create-toggle {
@@ -401,7 +405,7 @@ h1, h2, h3, h4, h5, h6 {
   gap: 0.4rem;
   background: var(--accent);
   color: #fff;
-  border: 1px solid rgba(49, 106, 112, 0.3);
+  border: 1px solid rgba(45, 107, 191, 0.3);
   border-radius: var(--radius-btn);
   padding: 0.7rem 1.2rem;
   font-size: 0.9rem;
@@ -435,15 +439,15 @@ select.form-select {
   padding-right: 2.25rem;
 }
 
-/* ── BUTTONS ─────────────────────────────────────────── */
+/* -- BUTTONS ------------------------------------------- */
 
-/* Primary — electric blue, used for all main CTAs */
+/* Primary � electric blue, used for all main CTAs */
 .btn-sun,
 .btn-primary,
 .btn-primary.cta-btn {
   background: var(--accent);
   color: #fff;
-  border: 1px solid rgba(49, 106, 112, 0.3);
+  border: 1px solid rgba(45, 107, 191, 0.3);
   border-radius: var(--radius-btn);
   padding: 0.7rem 1.5rem;
   font-family: inherit;
@@ -483,7 +487,7 @@ select.form-select {
   pointer-events: none;
 }
 
-/* Ghost — transparent with glass border */
+/* Ghost � transparent with glass border */
 .btn-ghost,
 .btn-secondary {
   background: transparent;
@@ -535,7 +539,7 @@ select.form-select {
   color: #fff;
 }
 
-/* Danger ghost — sign out, destructive actions */
+/* Danger ghost � sign out, destructive actions */
 .btn-outline-danger {
   background: transparent;
   color: var(--danger-light);
@@ -570,7 +574,7 @@ select.form-select {
   min-height: 36px;
 }
 
-/* ── STATUS CHIPS ────────────────────────────────────── */
+/* -- STATUS CHIPS -------------------------------------- */
 .chip {
   display: inline-flex;
   align-items: center;
@@ -598,7 +602,7 @@ select.form-select {
 .chip-lime {
   background: var(--accent-bg);
   color: var(--accent-light);
-  border: 1px solid rgba(49, 106, 112, 0.35);
+  border: 1px solid rgba(45, 107, 191, 0.35);
 }
 
 /* You're in / confirmed */
@@ -622,7 +626,7 @@ select.form-select {
   border: 1px solid var(--border-soft);
 }
 
-/* ── PLAYER AVATARS ──────────────────────────────────── */
+/* -- PLAYER AVATARS ------------------------------------ */
 .avatar {
   width: 36px;
   height: 36px;
@@ -683,7 +687,7 @@ select.form-select {
   color: rgba(140, 171, 215, 0.3);
 }
 
-/* ── EVENT CARD LAYOUT ───────────────────────────────── */
+/* -- EVENT CARD LAYOUT --------------------------------- */
 .event-time {
   font-size: 1.6rem;
   font-weight: 800;
@@ -731,7 +735,7 @@ select.form-select {
   flex: 1;
 }
 
-/* ── TOKEN DISPLAY ───────────────────────────────────── */
+/* -- TOKEN DISPLAY ------------------------------------- */
 .token-code {
   font-family: "Courier New", monospace;
   font-size: 0.78rem;
@@ -743,7 +747,7 @@ select.form-select {
   word-break: break-all;
 }
 
-/* ── BADGES ──────────────────────────────────────────── */
+/* -- BADGES -------------------------------------------- */
 .badge-role {
   background: var(--accent-bg);
   color: var(--accent-light);
@@ -756,7 +760,7 @@ select.form-select {
   border-radius: var(--radius-chip);
 }
 
-/* ── LEADERBOARD ─────────────────────────────────────── */
+/* -- LEADERBOARD --------------------------------------- */
 .leaderboard-row {
   display: flex;
   align-items: center;
@@ -787,7 +791,7 @@ select.form-select {
   color: var(--accent-light);
 }
 
-/* ── MISC ────────────────────────────────────────────── */
+/* -- MISC ---------------------------------------------- */
 .form-status {
   font-size: 0.85rem;
   color: var(--text-muted);
@@ -812,7 +816,7 @@ hr, .divider {
   color: var(--text-muted) !important;
 }
 
-/* ── PAGE ACTIONS ────────────────────────────────────── */
+/* -- PAGE ACTIONS -------------------------------------- */
 .page-actions {
   position: sticky;
   bottom: 1rem;
@@ -872,8 +876,8 @@ hr, .divider {
   width: 1.8rem;
   height: 1.8rem;
   border-radius: 8px;
-  border: 1px solid rgba(49, 106, 112, 0.35);
-  background: rgba(49, 106, 112, 0.14);
+  border: 1px solid rgba(45, 107, 191, 0.35);
+  background: var(--accent-bg);
   color: var(--accent-light);
   font-size: 0.9rem;
   font-weight: 800;
@@ -889,8 +893,8 @@ hr, .divider {
   width: 2.2rem;
   height: 2.2rem;
   border-radius: 10px;
-  border: 1px solid rgba(49, 106, 112, 0.35);
-  background: rgba(49, 106, 112, 0.14);
+  border: 1px solid rgba(45, 107, 191, 0.35);
+  background: var(--accent-bg);
   color: var(--accent-light);
   display: inline-flex;
   align-items: center;
@@ -898,7 +902,7 @@ hr, .divider {
   font-weight: 700;
 }
 
-/* ── EMPTY STATE ─────────────────────────────────────── */
+/* -- EMPTY STATE --------------------------------------- */
 .empty-state {
   text-align: center;
   padding: 2.5rem 1rem;
@@ -917,7 +921,7 @@ hr, .divider {
   margin-bottom: 1.25rem;
 }
 
-/* ── COURT SCORE CARDS ───────────────────────────────── */
+/* -- COURT SCORE CARDS --------------------------------- */
 .court-card {
   background: var(--bg-surface);
   border: 1px solid var(--border-soft);
@@ -948,7 +952,7 @@ hr, .divider {
   padding: 0.4rem;
 }
 
-/* ── SCROLLBAR ───────────────────────────────────────── */
+/* -- SCROLLBAR ----------------------------------------- */
 ::-webkit-scrollbar {
   width: 4px;
   height: 4px;
@@ -972,7 +976,7 @@ hr, .divider {
   scrollbar-color: rgba(60, 100, 180, 0.3) transparent;
 }
 
-/* ── RESPONSIVE ──────────────────────────────────────── */
+/* -- RESPONSIVE ---------------------------------------- */
 @media (max-width: 991px) {
   .hero-card {
     padding: 1.25rem;
@@ -1037,6 +1041,45 @@ hr, .divider {
   .danger-zone-card {
     padding: 1rem;
   }
+}
+
+/* -- Group Ranking (results.js) ------------------------------------------------ */
+.results-ranking-details,
+.results-events-details {
+  background: var(--bg-surface, #071a33);
+  border: 1px solid var(--border-soft, rgba(255,255,255,0.06));
+  border-radius: var(--radius-card, 16px);
+  padding: 1rem 1.25rem;
+}
+
+.results-ranking-summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+  user-select: none;
+}
+
+.results-ranking-summary::-webkit-details-marker { display: none; }
+
+.results-ranking-summary::before {
+  content: "?";
+  font-size: 0.65rem;
+  color: var(--text-muted, #7f9bbf);
+  transition: transform 160ms ease;
+}
+
+details[open] > .results-ranking-summary::before {
+  transform: rotate(90deg);
+}
+
+.results-ranking-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-primary, #e6f0ff);
+}
 
   .feature-tile {
     padding: 0.8rem;
@@ -1053,4 +1096,182 @@ hr, .divider {
     padding-left: 16px;
     padding-right: 16px;
   }
+}
+/* ------------------------------------------------------------------------------
+   Final screen, Results by Groups, Finalize button
+   ------------------------------------------------------------------------------ */
+
+/* -- Past events section ------------------------------------------------------- */
+.past-events-section {
+  margin-top: 0.5rem;
+}
+
+.past-events-summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius-card);
+  background: var(--bg-card);
+  border: 1px solid var(--border-input);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  user-select: none;
+}
+.past-events-summary::-webkit-details-marker { display: none; }
+.past-events-summary::before {
+  content: "?";
+  font-size: 0.65rem;
+  transition: transform 0.2s;
+}
+details[open] > .past-events-summary::before { transform: rotate(90deg); }
+
+.past-event-card {
+  opacity: 0.6;
+}
+.past-event-card:hover {
+  opacity: 1;
+}
+
+/* -- Finalize button pulse ----------------------------------------------------- */
+.btn-pulse {
+  animation: pulse-glow 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4); }
+  50%       { box-shadow: 0 0 0 8px rgba(220, 53, 69, 0); }
+}
+
+/* -- Final / Summary screen ---------------------------------------------------- */
+.final-screen {
+  text-align: center;
+}
+
+.final-header {
+  padding: 1.5rem 0 1rem;
+}
+
+.final-trophy {
+  font-size: 3.5rem;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.final-winner-block {
+  background: linear-gradient(135deg, #fef9c3 0%, #fde68a 100%);
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
+  margin: 1rem 0;
+}
+
+.final-winner-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #92400e;
+  margin-bottom: 0.25rem;
+}
+
+.final-winner-name {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #78350f;
+  line-height: 1.1;
+}
+
+.final-winner-pts {
+  font-size: 0.9rem;
+  color: #92400e;
+  margin-top: 0.25rem;
+}
+
+.final-podium {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 1.25rem 0;
+}
+
+.final-podium-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--bs-gray-100, #f8f9fa);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  min-width: 100px;
+  border: 2px solid transparent;
+}
+
+.final-podium-item.final-podium-me {
+  border-color: #22c55e;
+  background: #f0fdf4;
+}
+
+.final-medal {
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.final-player-name {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.final-player-pts {
+  font-size: 0.75rem;
+  color: var(--bs-secondary, #6c757d);
+  margin-top: 0.1rem;
+}
+
+/* -- Results by Groups page ---------------------------------------------------- */
+.results-group-section {
+  /* wrapper per group */
+}
+
+.results-group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.results-group-name {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.results-event-block {
+  background: var(--bs-white, #fff);
+  border: 1px solid var(--bs-border-color, #dee2e6);
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+}
+
+.results-event-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.results-winner-row {
+  font-size: 0.92rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+  margin-bottom: 0.25rem;
+}
+
+.results-table th,
+.results-table td {
+  font-size: 0.85rem;
+  vertical-align: middle;
 }

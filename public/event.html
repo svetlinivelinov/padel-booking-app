@@ -18,6 +18,7 @@
         <a class="nav-link" href="/group.html">Groups</a>
         <a class="nav-link active" href="/event.html">Events</a>
         <a class="nav-link" href="/court.html">Court</a>
+        <a class="nav-link" href="/results.html">Results</a>
         <a class="nav-link" href="/profile.html">Profile</a>
       </div>
     </div>
@@ -60,6 +61,14 @@
                   <label class="form-label" for="event-desc">Description</label>
                   <textarea class="form-control" id="event-desc" rows="2"></textarea>
                 </div>
+                <div class="mb-3">
+                  <label class="form-label" for="event-location">Location / Court</label>
+                  <input class="form-control" id="event-location" type="text" placeholder="e.g. Padel Club Sofia, Court 3">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label" for="event-notes">Notes</label>
+                  <textarea class="form-control" id="event-notes" rows="2" placeholder="Bring your own racket, parking info..."></textarea>
+                </div>
                 <div class="page-actions">
                   <button class="btn btn-sun" type="submit">Create event</button>
                 </div>
@@ -94,27 +103,18 @@
     import { refreshGroups } from "/assets/js/groups.js";
     document.addEventListener("DOMContentLoaded", () => {
       refreshGroups();
-      // EU date format for event-date input
       const dateInput = document.getElementById("event-date");
       if (dateInput) {
-        dateInput.addEventListener("change", (e) => {
-          // Optionally, you can display the selected date in EU format elsewhere
-        });
+        dateInput.addEventListener("change", () => {});
       }
-      // Max participants logic
       const typeSelect = document.getElementById("event-type");
-      const maxInput = document.getElementById("event-max");
+      const maxInput   = document.getElementById("event-max");
       if (typeSelect && maxInput) {
         typeSelect.addEventListener("change", () => {
-          if (typeSelect.value === "couples") {
-            maxInput.value = 8;
-          } else {
-            maxInput.value = 16;
-          }
+          maxInput.value = typeSelect.value === "couples" ? 8 : 16;
         });
       }
     });
   </script>
 </body>
 </html>
-

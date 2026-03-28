@@ -11,6 +11,7 @@ import {
   getLeaderboard,
   getCurrentRound,
   getCurrentUserId,
+  finalizeEvent,
 } from "./database.js";
 import { generateAmericanoRounds } from "./americano.js";
 
@@ -35,6 +36,8 @@ const roundSub       = document.querySelector("#round-sub");
 const courtCards     = document.querySelector("#court-cards");
 const leaderboard    = document.querySelector("#leaderboard");
 const nextRoundBtn   = document.querySelector("#next-round-btn");
+const finalizeBtn    = document.querySelector("#finalize-btn");
+const finalPanel     = document.querySelector("#final-panel");
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 async function init() {
@@ -65,11 +68,11 @@ async function loadEventOptions() {
 
   eventSelect.innerHTML = allEvents.length === 0
     ? `<option value="">No events found</option>`
-    : allEvents.map(e => `
-        <option value="${e.id}">
-          ${e.description || "Event"} — ${new Date(e.date_time).toLocaleDateString()}
-        </option>
-      `).join("");
+    : allEvents.map(e => {
+        const label = e.is_closed ? "🔒 " : "";
+        const status = e.game_status === "finished" ? " [Finished]" : e.game_status === "active" ? " [Active]" : "";
+        return `<option value="${e.id}">${label}${e.description || "Event"} — ${new Date(e.date_time).toLocaleDateString()}${status}</option>`;
+      }).join("");
 
   // Auto-select from URL
   const params = new URLSearchParams(window.location.search);
@@ -98,21 +101,36 @@ async function loadCourt() {
     playerProfiles[p.user_id] = p.user?.display_name || p.user?.username || "Player";
   });
 
-  // Determine what to show
   const isOrganizer = currentEvent.created_by === currentUser.id;
-  const gameStarted = currentEvent.game_status === "active";
+  const gameStatus = currentEvent.game_status || "pending";
+  const isClosed = currentEvent.is_closed === true;
 
-  startPanel.style.display   = "none";
-  gamePanel.style.display    = "none";
+  // Hide all panels first
+  startPanel.style.display  = "none";
+  gamePanel.style.display   = "none";
   if (emptyPanel) emptyPanel.style.display = "none";
+  if (finalPanel) finalPanel.style.display = "none";
 
-  if (!gameStarted && isOrganizer) {
-    startPanel.style.display = "block";
-    showEmptyState();
-  } else if (gameStarted) {
+  if (gameStatus === "finished" || isClosed) {
+    // Show final summary screen
+    await renderFinalScreen(isOrganizer);
+  } else if (gameStatus === "active") {
+    // Regenerate allRounds if empty (page refresh mid-game)
+    if (allRounds.length === 0 && currentEvent.total_rounds) {
+      const courts = Math.max(1, Math.floor(Object.keys(playerProfiles).length / 4));
+      allRounds = generateAmericanoRounds(Object.keys(playerProfiles), currentEvent.total_rounds, courts);
+    }
     gamePanel.style.display = "block";
     await loadRound();
+    // Show finalize button only for organizer when game is active
+    if (finalizeBtn) {
+      finalizeBtn.style.display = isOrganizer ? "block" : "none";
+    }
   } else {
+    // pending
+    if (isOrganizer) {
+      startPanel.style.display = "block";
+    }
     showEmptyState();
   }
 }
@@ -123,7 +141,6 @@ function updateNextEventLabel() {
     emptyNextEvent.textContent = "No scheduled events";
     return;
   }
-
   const now = new Date();
   const next = availableEvents.find(e => new Date(e.date_time) >= now) || availableEvents[0];
   emptyNextEvent.textContent = new Date(next.date_time).toLocaleString();
@@ -152,23 +169,27 @@ startBtn.addEventListener("click", async () => {
       throw new Error("Need at least 4 confirmed players to start");
     }
 
-    // Generate all rounds upfront
     const playerIds = Object.keys(playerProfiles);
     allRounds = generateAmericanoRounds(playerIds, totalRounds, courts);
 
-    // Save game settings
+    // Save game settings — this also sets game_status = 'active'
     await startGame(currentEvent.id, pointsPerMatch, totalRounds);
 
-    // Save all rounds and matches to DB
-    for (let i = 0; i < allRounds.length; i++) {
-      await generateRound(currentEvent.id, i + 1, allRounds[i]);
-    }
+    // Only generate round 1 — subsequent rounds generated on demand
+    await generateRound(currentEvent.id, 1, allRounds[0]);
 
     startStatus.textContent = "Game started!";
 
-    // Switch to game view
+    // Refresh event to get updated game_status
+    currentEvent = await getEvent(currentEvent.id);
+
     startPanel.style.display = "none";
-    gamePanel.style.display  = "block";
+    if (emptyPanel) emptyPanel.style.display = "none";
+    gamePanel.style.display = "block";
+
+    // Show finalize button for organizer
+    if (finalizeBtn) finalizeBtn.style.display = "block";
+
     currentRoundIndex = 0;
     await loadRound();
 
@@ -177,6 +198,129 @@ startBtn.addEventListener("click", async () => {
     startBtn.disabled = false;
   }
 });
+
+// ── Finalize event ────────────────────────────────────────────────────────────
+if (finalizeBtn) {
+  finalizeBtn.addEventListener("click", async () => {
+    const confirmed = confirm(
+      "Финализиране на събитието?\n\nСтатусът ще се смени на 'finished', събитието ще се затвори и ще се покаже финален екран с резултатите."
+    );
+    if (!confirmed) return;
+
+    finalizeBtn.disabled = true;
+    finalizeBtn.textContent = "Финализиране...";
+
+    try {
+      await finalizeEvent(currentEvent.id);
+      // Refresh event state
+      currentEvent = await getEvent(currentEvent.id);
+
+      // Hide game panel, show final screen
+      gamePanel.style.display = "none";
+      finalizeBtn.style.display = "none";
+      await renderFinalScreen(true);
+
+      // Reload dropdown to reflect [Finished] label
+      await loadEventOptions();
+      eventSelect.value = currentEvent.id;
+
+    } catch (err) {
+      alert("Грешка при финализиране: " + err.message);
+      finalizeBtn.disabled = false;
+      finalizeBtn.textContent = "🏁 Финализирай събитието";
+    }
+  });
+}
+
+// ── Final / Summary Screen ────────────────────────────────────────────────────
+async function renderFinalScreen(isOrganizer) {
+  if (!finalPanel) return;
+
+  finalPanel.style.display = "block";
+
+  // Get leaderboard data
+  const scores = await getLeaderboard(currentEvent.id);
+  const p = playerProfiles;
+
+  // If playerProfiles is empty (navigated directly), reload participants
+  if (Object.keys(p).length === 0) {
+    const participants = await getEventParticipants(currentEvent.id);
+    participants.filter(pt => pt.status === "confirmed").forEach(pt => {
+      playerProfiles[pt.user_id] = pt.user?.display_name || pt.user?.username || "Player";
+    });
+  }
+
+  const sorted = Object.entries(scores)
+    .sort((a, b) => b[1].points - a[1].points);
+
+  const winner = sorted[0];
+  const winnerName = winner ? (playerProfiles[winner[0]] || "Player") : "—";
+  const winnerPoints = winner ? winner[1].points : 0;
+
+  const podiumHTML = sorted.slice(0, 3).map(([userId, data], i) => {
+    const medals = ["🥇", "🥈", "🥉"];
+    const isMe = userId === currentUser?.id;
+    return `
+      <div class="final-podium-item ${isMe ? "final-podium-me" : ""}">
+        <div class="final-medal">${medals[i] || i + 1}</div>
+        <div class="final-player-name">${playerProfiles[userId] || "Player"}</div>
+        <div class="final-player-pts">${data.points} pts · ${data.played} played</div>
+      </div>`;
+  }).join("");
+
+  const fullTableHTML = sorted.length > 0 ? `
+    <table class="table table-sm mt-3">
+      <thead>
+        <tr><th>#</th><th>Player</th><th>Points</th><th>Played</th></tr>
+      </thead>
+      <tbody>
+        ${sorted.map(([userId, data], i) => `
+          <tr ${userId === currentUser?.id ? 'class="table-success"' : ""}>
+            <td>${i + 1}</td>
+            <td>${playerProfiles[userId] || "Player"}</td>
+            <td><strong>${data.points}</strong></td>
+            <td>${data.played}</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>` : `<p class="text-muted">No scores recorded.</p>`;
+
+  const closedBadge = currentEvent.is_closed
+    ? `<span class="badge bg-secondary ms-2">Closed</span>`
+    : "";
+
+  finalPanel.innerHTML = `
+    <div class="list-card frosted-card mb-4 final-screen">
+      <div class="final-header">
+        <div class="final-trophy">🏆</div>
+        <h4 class="fw-bold mb-1">Event Finished ${closedBadge}</h4>
+        <p class="text-muted mb-0">${currentEvent.description || "Padel Event"}</p>
+      </div>
+
+      <div class="final-winner-block">
+        <div class="final-winner-label">Winner</div>
+        <div class="final-winner-name">${winnerName}</div>
+        <div class="final-winner-pts">${winnerPoints} points</div>
+      </div>
+
+      <div class="final-podium">
+        ${podiumHTML}
+      </div>
+
+      <div class="event-divider my-3"></div>
+
+      <h6 class="fw-semibold mb-0">Full Leaderboard</h6>
+      ${fullTableHTML}
+
+      <div class="event-divider my-3"></div>
+
+      <div class="d-flex gap-2 flex-wrap">
+        <a href="/event.html" class="btn btn-ghost btn-sm">← Back to Events</a>
+        <a href="/court.html" class="btn btn-sun btn-sm">New Game</a>
+      </div>
+    </div>
+  `;
+}
 
 // ── Load current round ────────────────────────────────────────────────────────
 async function loadRound() {
@@ -192,11 +336,20 @@ async function loadRound() {
   const allScored = matches.every(m => m.status === "completed");
   const isLastRound = round.round_number >= currentEvent.total_rounds;
 
-  // Show next round button for organizer if all scored and not last round
+  // Show "Next round" for organizer if all scored and not last round
   if (isOrganizer && allScored && !isLastRound) {
     nextRoundBtn.style.display = "block";
   } else {
     nextRoundBtn.style.display = "none";
+  }
+
+  // Show "Finalize" for organizer on last round once all scored
+  if (finalizeBtn) {
+    if (isOrganizer && allScored && isLastRound) {
+      finalizeBtn.classList.add("btn-pulse");
+    } else if (isOrganizer) {
+      finalizeBtn.classList.remove("btn-pulse");
+    }
   }
 
   // Render court cards
@@ -206,7 +359,6 @@ async function loadRound() {
     courtCards.appendChild(card);
   });
 
-  // Render leaderboard
   await renderLeaderboard();
 }
 
@@ -262,37 +414,24 @@ function renderCourtCard(match, isOrganizer) {
           placeholder="Team B"
           style="max-width:80px"
         />
-        <button
-          class="btn btn-sm btn-sun"
-          data-submit-match="${match.id}">
-          Save
-        </button>
+        <button class="btn btn-sm btn-sun" data-submit-match="${match.id}">Save</button>
       </div>
     ` : ""}
   `;
 
-  // Score submission
   card.querySelector(`[data-submit-match]`)
     ?.addEventListener("click", async (e) => {
       const btn = e.currentTarget;
       const scoreA = Number.parseInt(document.querySelector(`#score-a-${match.id}`)?.value, 10);
       const scoreB = Number.parseInt(document.querySelector(`#score-b-${match.id}`)?.value, 10);
 
-      if (isNaN(scoreA) || isNaN(scoreB)) {
-        alert("Please enter both scores");
-        return;
-      }
-      if (scoreA < 0 || scoreB < 0) {
-        alert("Scores cannot be negative");
-        return;
-      }
+      if (isNaN(scoreA) || isNaN(scoreB)) { alert("Please enter both scores"); return; }
+      if (scoreA < 0 || scoreB < 0) { alert("Scores cannot be negative"); return; }
       if (scoreA > currentEvent.points_per_match || scoreB > currentEvent.points_per_match) {
-        alert(`Scores cannot exceed ${currentEvent.points_per_match}`);
-        return;
+        alert(`Scores cannot exceed ${currentEvent.points_per_match}`); return;
       }
       if (scoreA + scoreB !== currentEvent.points_per_match) {
-        alert(`Scores must add up to ${currentEvent.points_per_match}`);
-        return;
+        alert(`Scores must add up to ${currentEvent.points_per_match}`); return;
       }
 
       btn.disabled = true;
@@ -317,7 +456,11 @@ nextRoundBtn.addEventListener("click", async () => {
   nextRoundBtn.textContent = "Loading...";
 
   try {
-    currentRoundIndex++;
+    const nextIndex = currentRoundIndex + 1;
+    if (allRounds[nextIndex - 1]) {
+      await generateRound(currentEvent.id, nextIndex, allRounds[nextIndex - 1]);
+    }
+    currentRoundIndex = nextIndex;
     await loadRound();
   } catch (err) {
     alert(err.message);
@@ -343,12 +486,7 @@ async function renderLeaderboard() {
   leaderboard.innerHTML = `
     <table class="table table-sm">
       <thead>
-        <tr>
-          <th>#</th>
-          <th>Player</th>
-          <th>Points</th>
-          <th>Played</th>
-        </tr>
+        <tr><th>#</th><th>Player</th><th>Points</th><th>Played</th></tr>
       </thead>
       <tbody>
         ${sorted.map(([userId, data], i) => `
@@ -364,7 +502,7 @@ async function renderLeaderboard() {
   `;
 }
 
-// ── Auto refresh every 15 seconds ─────────────────────────────────────────────
+// ── Auto refresh every 15 seconds (only when active) ─────────────────────────
 setInterval(() => {
   if (!document.hidden && currentEvent?.game_status === "active") loadRound();
 }, 15000);

@@ -4,6 +4,7 @@ import {
   addGroupMember,
   joinGroupByToken,
   listMyGroups,
+  listGroupEvents,
 } from "./database.js";
 
 const createForm = document.querySelector("#group-create-form");
@@ -13,6 +14,58 @@ const status = document.querySelector("#group-status");
 
 // ── Safe status helper — works even if #group-status doesn't exist on the page
 const setStatus = (msg) => { if (status) status.textContent = msg; };
+
+function formatEventForInvite(event) {
+  if (!event) return "";
+
+  const eventType = event.type === "couples" ? "Couples" : "Individual";
+  const maxPlayers = Number(event.max_participants) || 0;
+
+  let when = "";
+  try {
+    const date = new Date(event.date_time);
+    if (!Number.isNaN(date.getTime())) {
+      const day = date.toLocaleDateString("en-GB", {
+        weekday: "short",
+        day: "2-digit",
+        month: "short",
+      });
+      const time = date.toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      }).toUpperCase();
+      when = `${day} ${time}`;
+    }
+  } catch {}
+
+  const details = [`${eventType} event`, `max ${maxPlayers} players`];
+  if (when) details.push(when);
+
+  const lines = [details.join(" · ")];
+  if (event.location) lines.push(`📍 ${event.location}`);
+  if (event.notes)    lines.push(`📝 ${event.notes}`);
+  return lines.join("\n");
+}
+
+async function buildInviteMessage(group, inviteUrl) {
+  const lines = [`Join my group: ${group.name}`];
+
+  try {
+    const events = await listGroupEvents(group.id);
+    const now = Date.now();
+    const upcoming = events.find((ev) => new Date(ev.date_time).getTime() > now) || events[0];
+    const eventLine = formatEventForInvite(upcoming);
+    if (eventLine) {
+      lines.push(eventLine);
+    }
+  } catch {
+    // Keep invite sharing resilient even if event fetch fails.
+  }
+
+  lines.push(`Invite link: ${inviteUrl}`);
+  return lines.join("\n");
+}
 
 // ── Invite link handler ───────────────────────────────────────────────────────
 (async () => {
@@ -113,7 +166,10 @@ export async function refreshGroups() {
           <div class="d-flex gap-2 flex-wrap">
             ${group.invite_token ? `
               <button class="btn btn-sm btn-outline-secondary" data-copy-link>
-                Copy invite link
+                Copy invite text
+              </button>
+              <button class="btn btn-sm btn-outline-secondary" data-share-whatsapp>
+                Share WhatsApp
               </button>
               <button class="btn btn-sm btn-outline-secondary" data-copy-token>
                 Copy token
@@ -130,14 +186,22 @@ export async function refreshGroups() {
 
       // Copy invite link
       item.querySelector("[data-copy-link]")?.addEventListener("click", async (e) => {
-        await navigator.clipboard.writeText(inviteUrl);
+        const inviteMessage = await buildInviteMessage(group, inviteUrl);
+        await navigator.clipboard.writeText(inviteMessage);
         const btn = e.currentTarget;
         if (btn) {
           btn.textContent = "Copied!";
           setTimeout(() => {
-            if (btn) btn.textContent = "Copy invite link";
+            if (btn) btn.textContent = "Copy invite text";
           }, 1500);
         }
+      });
+
+      // Share to WhatsApp with event details + invite link
+      item.querySelector("[data-share-whatsapp]")?.addEventListener("click", async () => {
+        const inviteMessage = await buildInviteMessage(group, inviteUrl);
+        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(inviteMessage)}`;
+        window.open(whatsappUrl, "_blank", "noopener");
       });
 
       // Copy token

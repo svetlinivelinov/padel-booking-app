@@ -1,68 +1,78 @@
 import { supabase } from "./config.js";
 
+/**
+ * Финализира събитие:
+ * - Сменя game_status на 'finished'
+ * - Слага is_closed = true
+ */
+export async function finalizeEvent(eventId) {
+  const { error } = await supabase
+    .from("events")
+    .update({
+      game_status: "finished",
+      is_closed: true,
+    })
+    .eq("id", eventId);
+  if (error) throw error;
+}
+
 // ── Court / match functions ───────────────────────────────────────────────────
 
 export async function startGame(eventId, pointsPerMatch, totalRounds) {
-  const userId = await getCurrentUserId();
-  if (!userId) throw new Error("Please sign in");
-
-  // Prevent starting if already active
-  const { data: event, error: eventError1 } = await supabase
-    .from("events")
-    .select("game_status, created_by")
-    .eq("id", eventId)
-    .maybeSingle();
-  if (eventError1) throw eventError1;
-  if (!event) throw new Error("Event not found");
-  if (event.created_by !== userId) {
-    throw new Error("Only the organizer can start the game");
-  }
-  if (event && event.game_status === "active") {
-    throw new Error("Game already started");
-  }
-
-  const { error: eventError2 } = await supabase
+  const { error } = await supabase
     .from("events")
     .update({
       game_status: "active",
       points_per_match: pointsPerMatch,
       total_rounds: totalRounds,
+      current_round: 1,
     })
     .eq("id", eventId);
-
-  if (eventError2) throw eventError2;
+  if (error) throw error;
 }
 
 export async function generateRound(eventId, roundNumber, matches) {
-  // Create round
-  const { data: round, error: roundError } = await supabase
+  // 1. Маркирай предишния round като completed (ако съществува)
+  await supabase
     .from("rounds")
-    .insert({ event_id: eventId, round_number: roundNumber })
-    .select("*")
+    .update({ status: "completed" })
+    .eq("event_id", eventId)
+    .eq("status", "active");
+
+  // 2. Створай новия round (delete+insert to avoid upsert conflict issues)
+  await supabase
+    .from("rounds")
+    .delete()
+    .eq("event_id", eventId)
+    .eq("round_number", roundNumber);
+
+  const { data: round, error: roundErr } = await supabase
+    .from("rounds")
+    .insert({
+      event_id: eventId,
+      round_number: roundNumber,
+      status: "active",
+    })
+    .select()
     .single();
+  if (roundErr) throw roundErr;
 
-  if (roundError) throw roundError;
-
-  // Insert matches
+  // 3. Запиши matches за този round
   const matchRows = matches.map((m, i) => ({
     event_id: eventId,
     round_id: round.id,
     round_number: roundNumber,
     court_number: i + 1,
-    team_a_p1: m.team_a[0],
-    team_a_p2: m.team_a[1],
-    team_b_p1: m.team_b[0],
-    team_b_p2: m.team_b[1],
+    team_a_p1: m.team_a?.[0] ?? m.team_a_p1,
+    team_a_p2: m.team_a?.[1] ?? m.team_a_p2,
+    team_b_p1: m.team_b?.[0] ?? m.team_b_p1,
+    team_b_p2: m.team_b?.[1] ?? m.team_b_p2,
     status: "pending",
   }));
-
-  const { error: matchError } = await supabase
+  const { error: matchErr } = await supabase
     .from("matches")
     .insert(matchRows);
-
-  if (matchError) throw matchError;
-
-  return round;
+  if (matchErr) throw matchErr;
 }
 
 export async function getMatches(eventId, roundNumber) {
@@ -72,75 +82,56 @@ export async function getMatches(eventId, roundNumber) {
     .eq("event_id", eventId)
     .eq("round_number", roundNumber)
     .order("court_number", { ascending: true });
-
   if (error) throw error;
-  return data;
+  return data || [];
 }
 
 export async function submitScore(matchId, scoreA, scoreB) {
   const { error } = await supabase
     .from("matches")
-    .update({ score_a: scoreA, score_b: scoreB, status: "completed" })
+    .update({
+      score_a: scoreA,
+      score_b: scoreB,
+      status: "completed",
+    })
     .eq("id", matchId);
-
   if (error) throw error;
 }
 
 export async function getLeaderboard(eventId) {
-  const { data, error } = await supabase
+  const { data: matches, error } = await supabase
     .from("matches")
     .select("*")
     .eq("event_id", eventId)
     .eq("status", "completed");
-
   if (error) throw error;
-
-  // Compute scores per player
+  if (!matches || matches.length === 0) return {};
   const scores = {};
-
-  data.forEach((match) => {
-    [match.team_a_p1, match.team_a_p2].forEach((pid) => {
-      if (!pid) return;
-      if (!scores[pid]) scores[pid] = { points: 0, played: 0 };
-      scores[pid].points += match.score_a || 0;
-      scores[pid].played += 1;
-    });
-    [match.team_b_p1, match.team_b_p2].forEach((pid) => {
-      if (!pid) return;
-      if (!scores[pid]) scores[pid] = { points: 0, played: 0 };
-      scores[pid].points += match.score_b || 0;
-      scores[pid].played += 1;
-    });
-  });
-
+  const addPoints = (userId, pts) => {
+    if (!userId) return;
+    if (!scores[userId]) scores[userId] = { points: 0, played: 0 };
+    scores[userId].points += pts;
+    scores[userId].played += 1;
+  };
+  for (const m of matches) {
+    addPoints(m.team_a_p1, m.score_a ?? 0);
+    addPoints(m.team_a_p2, m.score_a ?? 0);
+    addPoints(m.team_b_p1, m.score_b ?? 0);
+    addPoints(m.team_b_p2, m.score_b ?? 0);
+  }
   return scores;
 }
 
 export async function getCurrentRound(eventId) {
-  // Get the first round that has pending matches
   const { data, error } = await supabase
     .from("rounds")
     .select("*")
     .eq("event_id", eventId)
     .eq("status", "active")
-    .order("round_number", { ascending: true })
+    .order("round_number", { ascending: false })
     .limit(1)
     .maybeSingle();
-
   if (error) throw error;
-
-  // If no active round, get the latest completed one
-  if (!data) {
-    const { data: last } = await supabase
-      .from("rounds")
-      .select("*")
-      .eq("event_id", eventId)
-      .order("round_number", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    return last;
-  }
-
   return data;
 }
 // Get all participants for an event
@@ -170,7 +161,7 @@ export async function getEventParticipants(eventId) {
   // Attach profile to each participant
   return data.map(p => ({
     ...p,
-    user: profiles?.find(pr => pr.id === p.user_id) || null
+    user: profiles?.find(pr => pr.id === p.user_id) || { display_name: null, username: p.user_id?.slice(0, 8) }
   }));
 }
 
@@ -333,7 +324,7 @@ export async function listGroupEvents(groupId) {
     .from("events")
     .select("*")
     .eq("group_id", groupId)
-    .order("date_time", { ascending: true });
+    .order("date_time", { ascending: false });
 
   if (error) {
     throw error;

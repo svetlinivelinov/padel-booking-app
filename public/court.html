@@ -18,6 +18,7 @@
         <a href="/group.html" class="nav-link">Groups</a>
         <a href="/event.html" class="nav-link">Events</a>
         <a href="/court.html" class="nav-link active">Court</a>
+        <a href="/results.html" class="nav-link">Results</a>
         <a href="/profile.html" class="nav-link">Profile</a>
       </div>
     </div>
@@ -42,27 +43,11 @@
       <h5 class="fw-semibold mb-3">Start game</h5>
       <div class="mb-3">
         <label class="form-label small">Points per match</label>
-        <input
-          type="number"
-          id="points-per-match"
-          class="form-control"
-          value="16"
-          min="8"
-          max="32"
-          style="max-width:120px"
-        />
+        <input type="number" id="points-per-match" class="form-control" value="16" min="8" max="32" style="max-width:120px"/>
       </div>
       <div class="mb-3">
         <label class="form-label small">Number of rounds</label>
-        <input
-          type="number"
-          id="total-rounds"
-          class="form-control"
-          value="6"
-          min="1"
-          max="12"
-          style="max-width:120px"
-        />
+        <input type="number" id="total-rounds" class="form-control" value="6" min="1" max="12" style="max-width:120px"/>
       </div>
       <div class="page-actions">
         <button id="start-btn" class="btn btn-primary cta-btn">Start game</button>
@@ -73,15 +58,21 @@
     <!-- Active game panel -->
     <div id="game-panel" style="display:none">
 
-      <!-- Round info -->
-      <div class="list-card mb-3 d-flex justify-content-between align-items-center frosted-card">
+      <!-- Round info + finalize button -->
+      <div class="list-card mb-3 d-flex justify-content-between align-items-center frosted-card flex-wrap gap-2">
         <div>
           <span class="fw-semibold" id="round-label">Round 1</span>
           <span class="text-muted small ms-2" id="round-sub"></span>
         </div>
-        <button id="next-round-btn" class="btn btn-sm btn-primary cta-btn" style="display:none">
-          Next round →
-        </button>
+        <div class="d-flex gap-2">
+          <button id="next-round-btn" class="btn btn-sm btn-primary cta-btn" style="display:none">
+            Next round →
+          </button>
+          <!-- Finalize button — visible only for organizer, injected by court.js -->
+          <button id="finalize-btn" class="btn btn-sm btn-danger" style="display:none">
+            🏁 Финализирай събитието
+          </button>
+        </div>
       </div>
 
       <!-- Court cards -->
@@ -94,6 +85,9 @@
       </div>
 
     </div>
+
+    <!-- Final / Summary screen -->
+    <div id="final-panel" style="display:none"></div>
 
     <!-- Empty state panel -->
     <div id="empty-panel" class="list-card frosted-card court-empty-state" style="display:none">
