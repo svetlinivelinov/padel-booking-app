@@ -7,6 +7,7 @@ setInterval(() => {
 
 import {
   createEvent,
+  listMyGroups,
   listGroupEvents,
   joinEvent,
   leaveEvent,
@@ -67,10 +68,38 @@ document.addEventListener("DOMContentLoaded", () => {
 
 let editingEventId = null;
 let refreshVersion = 0;
+let focusedSharedEvent = false;
 window.refreshEvents = refreshEvents;
 
+function formatEventInviteDetails(event) {
+  const label = event.description || "Padel event";
+  let when = "";
+  try {
+    const d = new Date(event.date_time);
+    when = d.toLocaleString("en-GB", {
+      weekday: "short",
+      day: "2-digit",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    }).toUpperCase();
+  } catch {
+    when = "";
+  }
+
+  const lines = ["Join this event in my group:", label];
+  if (when) lines.push(when);
+  if (event.location) lines.push(`📍 ${event.location}`);
+  return lines.join("\n");
+}
+
+function buildEventInviteLink(inviteToken, eventId) {
+  return `${window.location.origin}/group.html?invite=${inviteToken}&event=${encodeURIComponent(eventId)}`;
+}
+
 // ── Render a single event card ────────────────────────────────────────────────
-async function renderEventCard(event, userId) {
+async function renderEventCard(event, userId, groupInviteToken) {
   const participants    = await getEventParticipants(event.id);
   const confirmed       = participants.filter(p => p.status === "confirmed");
   const waitlisted      = participants.filter(p => p.status === "waitlisted");
@@ -133,6 +162,7 @@ async function renderEventCard(event, userId) {
     </div>` : "";
 
   const isOrganizer = event.created_by === userId;
+  const hasEventInvite = Boolean(groupInviteToken);
 
   // Action buttons — join or leave
   const actionsHTML = myParticipation ? `
@@ -144,9 +174,15 @@ async function renderEventCard(event, userId) {
     ${isOrganizer ? `<button class="btn btn-ghost btn-sm" data-edit-id="${event.id}">Edit</button>` : ""}
   `;
 
+  const inviteActionsHTML = hasEventInvite ? `
+    <button class="btn btn-sm btn-outline-secondary" data-copy-event-invite>Copy event invite</button>
+    <button class="btn btn-sm btn-outline-secondary" data-share-event-whatsapp>Share event</button>
+  ` : "";
+
   // ── Assemble card ──
   const item = document.createElement("div");
   item.className = "list-card event-card mb-3";
+  item.id = `event-card-${event.id}`;
   item.innerHTML = `
     <div class="event-header">
       <div>
@@ -176,7 +212,29 @@ async function renderEventCard(event, userId) {
     <div class="event-actions" id="actions-${event.id}">
       ${actionsHTML}
     </div>
+    ${inviteActionsHTML ? `<div class="event-actions mt-2">${inviteActionsHTML}</div>` : ""}
   `;
+
+  if (hasEventInvite) {
+    const eventInviteUrl = buildEventInviteLink(groupInviteToken, event.id);
+    const inviteMessage = `${formatEventInviteDetails(event)}\nInvite link: ${eventInviteUrl}`;
+
+    item.querySelector("[data-copy-event-invite]")?.addEventListener("click", async (e) => {
+      await navigator.clipboard.writeText(inviteMessage);
+      const btn = e.currentTarget;
+      if (btn) {
+        btn.textContent = "Copied!";
+        setTimeout(() => {
+          if (btn) btn.textContent = "Copy event invite";
+        }, 1500);
+      }
+    });
+
+    item.querySelector("[data-share-event-whatsapp]")?.addEventListener("click", () => {
+      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(inviteMessage)}`;
+      window.open(whatsappUrl, "_blank", "noopener");
+    });
+  }
 
   // Wire join
   item.querySelector("[data-join-id]")?.addEventListener("click", async (e) => {
@@ -249,8 +307,15 @@ export async function refreshEvents() {
   const userId = await getCurrentUserId();
   if (currentVersion !== refreshVersion) return;
 
-  const events = await listGroupEvents(groupSelect.value);
+  const [events, groups] = await Promise.all([
+    listGroupEvents(groupSelect.value),
+    listMyGroups(userId),
+  ]);
   if (currentVersion !== refreshVersion) return;
+
+  const selectedGroup = groups.find((g) => g.id === groupSelect.value);
+  const groupInviteToken = selectedGroup?.invite_token || null;
+  const requestedEventId = new URLSearchParams(window.location.search).get("event");
 
   list.innerHTML = "";
 
@@ -270,7 +335,7 @@ export async function refreshEvents() {
   // Render upcoming events
   for (const event of upcoming) {
     if (currentVersion !== refreshVersion) return;
-    const card = await renderEventCard(event, userId);
+    const card = await renderEventCard(event, userId, groupInviteToken);
     if (currentVersion !== refreshVersion) return;
     list.appendChild(card);
   }
@@ -291,12 +356,22 @@ export async function refreshEvents() {
 
     for (const event of past) {
       if (currentVersion !== refreshVersion) return;
-      const card = await renderEventCard(event, userId);
+      const card = await renderEventCard(event, userId, groupInviteToken);
       card.classList.add("past-event-card");
       if (currentVersion !== refreshVersion) return;
       pastSection.appendChild(card);
     }
     list.appendChild(pastSection);
+  }
+
+  if (requestedEventId && !focusedSharedEvent) {
+    const target = document.querySelector(`#event-card-${requestedEventId}`);
+    if (target) {
+      target.classList.add("event-card-focus");
+      target.scrollIntoView({ behavior: "smooth", block: "center" });
+      focusedSharedEvent = true;
+      setStatus("Shared event opened.");
+    }
   }
 }
 

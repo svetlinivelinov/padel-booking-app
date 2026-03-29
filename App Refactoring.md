@@ -1,3 +1,8 @@
+Update (March 2026)
+- `group.html` now focuses on creating groups only.
+- Manual invite-token join UI is deprecated.
+- Global nav label is `Upcoming` (dashboard) instead of `Groups`.
+
 You are refactoring the layout of a Bootstrap-based web application.
 
 Goal: introduce a centered layout wrapper for application pages **without interfering with existing Bootstrap containers or navbar layout**.

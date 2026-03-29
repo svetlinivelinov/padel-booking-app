@@ -66,12 +66,18 @@ async function loadEventOptions() {
   allEvents.sort((a, b) => new Date(a.date_time) - new Date(b.date_time));
   availableEvents = allEvents;
 
-  eventSelect.innerHTML = allEvents.length === 0
-    ? `<option value="">No events found</option>`
-    : allEvents.map(e => {
-        const label = e.is_closed ? "🔒 " : "";
-        const status = e.game_status === "finished" ? " [Finished]" : e.game_status === "active" ? " [Active]" : "";
-        return `<option value="${e.id}">${label}${e.description || "Event"} — ${new Date(e.date_time).toLocaleDateString()}${status}</option>`;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const upcomingEvents = allEvents.filter(e =>
+    e.game_status !== "finished" &&
+    (new Date(e.date_time) >= today || e.game_status === "active")
+  );
+
+  eventSelect.innerHTML = upcomingEvents.length === 0
+    ? `<option value="">No upcoming events</option>`
+    : upcomingEvents.map(e => {
+        const status = e.game_status === "active" ? " [Active]" : "";
+        return `<option value="${e.id}">${e.description || "Event"} — ${new Date(e.date_time).toLocaleDateString()}${status}</option>`;
       }).join("");
 
   // Auto-select from URL

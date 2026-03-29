@@ -18,7 +18,7 @@
         <span id="user-display" class="brand-user"></span>
       </a>
       <div class="d-flex gap-3">
-        <a class="nav-link" href="/group.html">Groups</a>
+        <a class="nav-link active" href="/dashboard.html">Upcoming</a>
         <a class="nav-link" id="events-nav-link" href="/event.html">Events</a>
         <a class="nav-link" href="/court.html">Court</a>
         <a class="nav-link" href="/results.html">Results</a>
@@ -36,10 +36,13 @@
     <div class="container">
       <div class="row g-3 align-items-center compact-filter-row">
         <div class="col-lg-2 col-md-3">
-          <label class="form-label mb-0" for="group-select">Group</label>
+          <label class="form-label mb-0" for="group-select">Upcoming</label>
         </div>
         <div class="col-lg-6 col-md-9">
           <select id="group-select" class="form-select"></select>
+          <div class="mt-2">
+            <a class="btn btn-ghost btn-sm" href="/event.html?createGroup=1">+ Create group</a>
+          </div>
         </div>
       </div>
       <div class="row g-4 mt-1">

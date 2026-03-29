@@ -1,4 +1,9 @@
 
+Update (March 2026)
+- Navigation now uses `Upcoming` instead of `Groups`.
+- `group.html` is simplified to create-group only.
+- Manual "Join with invite token" UI is deprecated; event-level invite links are the active flow.
+
 Copilot Implementation Instructions – UI Redesign
 You are refactoring an existing web app UI.
 The goal is improving usability and layout priority while keeping the current design system and styling.

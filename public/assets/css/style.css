@@ -9,48 +9,67 @@
 /* -- TOKENS ------------------------------------------- */
 :root {
   /* Background */
-  --bg-base:             #020617;
-  --bg-surface:          #071a33;
-  --bg-surface-elevated: #0a2140;
-  --bg-input:            #041428;
-  --bg-nav:              rgba(2, 20, 43, 0.82);
+  --bg-base:             #07090f;
+  --bg-surface:          #12151c;
+  --bg-surface-elevated: #181c24;
+  --bg-input:            #0f131a;
+  --bg-nav:              rgba(9, 12, 18, 0.82);
+  --bg-gradient-top:     #142a45;
+  --bg-gradient-mid:     #0c111a;
+  --bg-gradient-bottom:  #07090f;
+  --bg-ambient-a:        rgba(37, 132, 230, 0.20);
+  --bg-ambient-b:        rgba(22, 185, 255, 0.16);
 
   /* Text */
-  --text-primary:  #e6f0ff;
-  --text-secondary:#9bb3d4;
-  --text-muted:    #7f9bbf;
-  --text-faint:    rgba(155, 179, 212, 0.55);
+  --text-primary:  #f3f7ff;
+  --text-secondary:#c5d1e2;
+  --text-muted:    #8e9bb0;
+  --text-faint:    rgba(197, 209, 226, 0.54);
 
   /* Borders */
-  --border-soft:   rgba(255, 255, 255, 0.06);
-  --border-input:  #17365d;
-  --border-strong: rgba(255, 255, 255, 0.12);
+  --border-soft:   rgba(255, 255, 255, 0.08);
+  --border-input:  #2a3345;
+  --border-strong: rgba(255, 255, 255, 0.16);
 
   /* Accent � blue */
-  --accent:        #2d6bbf;
-  --accent-strong: #1f52a0;
-  --accent-light:  #6a9fd4;
-  --accent-glow:   rgba(45, 107, 191, 0.24);
-  --accent-bg:     rgba(45, 107, 191, 0.14);
+  --accent:        #1694ff;
+  --accent-strong: #0f79d4;
+  --accent-light:  #5ec5ff;
+  --accent-glow:   rgba(22, 148, 255, 0.30);
+  --accent-bg:     rgba(22, 148, 255, 0.16);
+  --on-accent:     #f7fbff;
 
   /* Lime � active / highlight */
-  --lime:          #c8cc50;
-  --lime-dim:      #a0a830;
-  --lime-bg:       rgba(200, 204, 80, 0.12);
-  --lime-border:   rgba(200, 204, 80, 0.30);
+  --lime:          #4eb9ff;
+  --lime-dim:      #3698d9;
+  --lime-bg:       rgba(78, 185, 255, 0.14);
+  --lime-border:   rgba(78, 185, 255, 0.35);
+
+  /* Success */
+  --success:       #39d0b0;
+  --success-light: #89f0dc;
+  --success-bg:    rgba(57, 208, 176, 0.14);
+  --success-border:rgba(57, 208, 176, 0.38);
 
   /* Shine � glass edge highlight */
-  --shine:         rgba(130, 170, 255, 0.35);
-  --shine-bright:  rgba(180, 210, 255, 0.60);
+  --shine:         rgba(130, 196, 255, 0.32);
+  --shine-bright:  rgba(196, 234, 255, 0.56);
 
   /* Danger */
   --danger:        #ff5b6f;
   --danger-light:  #ff90a0;
   --danger-bg:     rgba(255, 91, 111, 0.12);
   --danger-border: rgba(255, 91, 111, 0.35);
+  --danger-ring:   rgba(255, 91, 111, 0.40);
+  --danger-ring-fade: rgba(255, 91, 111, 0);
+
+  /* Winner card */
+  --winner-bg-start:#1e2f45;
+  --winner-bg-end:  #2a4667;
+  --winner-text:    #d9ecff;
 
   /* Divider */
-  --divider:       rgba(200, 220, 255, 0.06);
+  --divider:       rgba(205, 220, 242, 0.10);
 
   /* Radii */
   --radius-card:   16px;
@@ -64,8 +83,8 @@
   --t-slow:   260ms ease;
 
   /* Shadows */
-  --shadow-card: 0 10px 25px rgba(0,0,0,0.35);
-  --shadow-card-hover: 0 14px 32px rgba(0,0,0,0.40);
+  --shadow-card: 0 10px 28px rgba(0,0,0,0.34);
+  --shadow-card-hover: 0 16px 36px rgba(0,0,0,0.42);
   --shadow-btn:  0 2px 12px var(--accent-bg);
 }
 
@@ -80,7 +99,10 @@ html, body {
 
 body {
   font-family: "DM Sans", "Manrope", sans-serif;
-  background: linear-gradient(180deg, #06254d 0%, #02142b 60%, #020617 100%);
+  background:
+    radial-gradient(1000px 420px at 15% -10%, var(--bg-ambient-a), transparent 60%),
+    radial-gradient(900px 380px at 100% 100%, var(--bg-ambient-b), transparent 60%),
+    linear-gradient(180deg, var(--bg-gradient-top) 0%, var(--bg-gradient-mid) 58%, var(--bg-gradient-bottom) 100%);
   background-attachment: fixed;
   color: var(--text-secondary);
   margin: 0;
@@ -229,15 +251,15 @@ h1, h2, h3, h4, h5, h6 {
   height: 2px;
   border-radius: 999px;
   background: var(--accent);
-  box-shadow: 0 0 10px rgba(45, 107, 191, 0.35);
+  box-shadow: 0 0 12px var(--accent-glow);
   opacity: 1;
 }
 
 /* Book Court CTA in nav */
 .btn-nav-cta {
   background: var(--accent);
-  color: #fff;
-  border: 1px solid rgba(45, 107, 191, 0.3);
+  color: var(--on-accent);
+  border: 1px solid var(--accent-glow);
   border-radius: var(--radius-btn);
   padding: 0.45rem 1rem;
   font-size: 0.82rem;
@@ -256,7 +278,7 @@ h1, h2, h3, h4, h5, h6 {
   transform: translateY(-1px);
   background: var(--accent-strong);
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
-  color: #fff;
+  color: var(--on-accent);
 }
 
 /* -- CARDS --------------------------------------------- */
@@ -382,11 +404,11 @@ h1, h2, h3, h4, h5, h6 {
   border-color: var(--accent);
   background: var(--bg-input);
   color: var(--text-primary);
-  box-shadow: 0 0 0 2px rgba(45, 107, 191, 0.2);
+  box-shadow: 0 0 0 2px var(--accent-bg);
 }
 
 .form-control::placeholder {
-  color: #6b8bb3;
+  color: var(--text-muted);
   opacity: 1;
 }
 
@@ -404,8 +426,8 @@ input[type="datetime-local"].form-control {
   align-items: center;
   gap: 0.4rem;
   background: var(--accent);
-  color: #fff;
-  border: 1px solid rgba(45, 107, 191, 0.3);
+  color: var(--on-accent);
+  border: 1px solid var(--accent-glow);
   border-radius: var(--radius-btn);
   padding: 0.7rem 1.2rem;
   font-size: 0.9rem;
@@ -446,8 +468,8 @@ select.form-select {
 .btn-primary,
 .btn-primary.cta-btn {
   background: var(--accent);
-  color: #fff;
-  border: 1px solid rgba(45, 107, 191, 0.3);
+  color: var(--on-accent);
+  border: 1px solid var(--accent-glow);
   border-radius: var(--radius-btn);
   padding: 0.7rem 1.5rem;
   font-family: inherit;
@@ -471,7 +493,7 @@ select.form-select {
   transform: translateY(-1px);
   background: var(--accent-strong);
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
-  color: #fff;
+  color: var(--on-accent);
 }
 
 .btn-sun:active,
@@ -536,7 +558,7 @@ select.form-select {
 
 .btn-sun .btn-icon,
 .btn-primary .btn-icon {
-  color: #fff;
+  color: var(--on-accent);
 }
 
 /* Danger ghost � sign out, destructive actions */
@@ -560,7 +582,7 @@ select.form-select {
 .btn-outline-danger:hover {
   background: var(--danger-bg);
   border-color: var(--danger);
-  color: #ffd3d9;
+  color: var(--danger-light);
 }
 
 .btn-outline-danger:active {
@@ -735,6 +757,11 @@ select.form-select {
   flex: 1;
 }
 
+.event-card-focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 2px var(--accent-bg), var(--shadow-card-hover);
+}
+
 /* -- TOKEN DISPLAY ------------------------------------- */
 .token-code {
   font-family: "Courier New", monospace;
@@ -798,7 +825,7 @@ select.form-select {
 }
 
 .form-status.success {
-  color: #7ec87e;
+  color: var(--success);
 }
 
 .form-status.error {
@@ -1142,8 +1169,8 @@ details[open] > .past-events-summary::before { transform: rotate(90deg); }
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4); }
-  50%       { box-shadow: 0 0 0 8px rgba(220, 53, 69, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 var(--danger-ring); }
+  50%       { box-shadow: 0 0 0 8px var(--danger-ring-fade); }
 }
 
 /* -- Final / Summary screen ---------------------------------------------------- */
@@ -1162,7 +1189,8 @@ details[open] > .past-events-summary::before { transform: rotate(90deg); }
 }
 
 .final-winner-block {
-  background: linear-gradient(135deg, #fef9c3 0%, #fde68a 100%);
+  background: linear-gradient(135deg, var(--winner-bg-start) 0%, var(--winner-bg-end) 100%);
+  border: 1px solid var(--accent-glow);
   border-radius: 1rem;
   padding: 1.25rem 1.5rem;
   margin: 1rem 0;
@@ -1173,20 +1201,20 @@ details[open] > .past-events-summary::before { transform: rotate(90deg); }
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #92400e;
+  color: var(--winner-text);
   margin-bottom: 0.25rem;
 }
 
 .final-winner-name {
   font-size: 1.75rem;
   font-weight: 800;
-  color: #78350f;
+  color: var(--winner-text);
   line-height: 1.1;
 }
 
 .final-winner-pts {
   font-size: 0.9rem;
-  color: #92400e;
+  color: var(--winner-text);
   margin-top: 0.25rem;
 }
 
@@ -1202,16 +1230,16 @@ details[open] > .past-events-summary::before { transform: rotate(90deg); }
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: var(--bs-gray-100, #f8f9fa);
+  background: var(--bg-surface-elevated);
   border-radius: 0.75rem;
   padding: 0.75rem 1.25rem;
   min-width: 100px;
-  border: 2px solid transparent;
+  border: 2px solid var(--border-soft);
 }
 
 .final-podium-item.final-podium-me {
-  border-color: #22c55e;
-  background: #f0fdf4;
+  border-color: var(--success-border);
+  background: var(--success-bg);
 }
 
 .final-medal {
@@ -1226,7 +1254,7 @@ details[open] > .past-events-summary::before { transform: rotate(90deg); }
 
 .final-player-pts {
   font-size: 0.75rem;
-  color: var(--bs-secondary, #6c757d);
+  color: var(--text-muted);
   margin-top: 0.1rem;
 }
 
@@ -1248,8 +1276,8 @@ details[open] > .past-events-summary::before { transform: rotate(90deg); }
 }
 
 .results-event-block {
-  background: var(--bs-white, #fff);
-  border: 1px solid var(--bs-border-color, #dee2e6);
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-soft);
   border-radius: 0.75rem;
   padding: 1rem 1.25rem;
 }
@@ -1266,8 +1294,33 @@ details[open] > .past-events-summary::before { transform: rotate(90deg); }
 .results-winner-row {
   font-size: 0.92rem;
   padding: 0.35rem 0;
-  border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+  border-bottom: 1px solid var(--divider);
   margin-bottom: 0.25rem;
+}
+
+.badge.bg-success {
+  background: var(--success-bg) !important;
+  color: var(--success-light) !important;
+  border: 1px solid var(--success-border);
+}
+
+.badge.bg-secondary {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: var(--text-secondary) !important;
+  border: 1px solid var(--border-soft);
+}
+
+.badge.bg-primary-subtle,
+.badge.text-primary-emphasis {
+  background: var(--accent-bg) !important;
+  color: var(--accent-light) !important;
+  border: 1px solid var(--accent-glow);
+}
+
+.table-success {
+  --bs-table-bg: var(--success-bg);
+  --bs-table-striped-bg: var(--success-bg);
+  --bs-table-color: var(--text-primary);
 }
 
 .results-table th,

@@ -128,6 +128,11 @@ background:#041428;
 border:1px solid #17365d;
 }
 
+Update (March 2026)
+- Replace all navigation references to `Groups` with `Upcoming`.
+- Any styling guidance for `Your groups` and `Join with invite token` sections is legacy.
+- Invite-token entry UI is deprecated in favor of event invite links.
+
 input:focus {
 border-color:#3B82F6;
 box-shadow:0 0 0 2px rgba(59,130,246,0.2);

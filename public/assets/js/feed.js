@@ -59,8 +59,8 @@ async function loadGroups() {
       list.innerHTML = `
         <div class="empty-state">
           <div class="empty-state-title">No groups yet</div>
-          <div class="empty-state-desc">Join or create a group to see upcoming events.</div>
-          <a href="/group.html" class="btn btn-sun btn-sm" style="margin-top:0.5rem;">Go to Groups</a>
+          <div class="empty-state-desc">Create your first group to unlock Upcoming events.</div>
+          <a href="/event.html?createGroup=1" class="btn btn-sun btn-sm" style="margin-top:0.5rem;">Create group</a>
         </div>`;
     }
     return;
