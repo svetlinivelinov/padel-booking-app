@@ -19,16 +19,20 @@ drop policy if exists "participants_insert" on public.event_participants;
 
 -- Profiles: any authenticated user can read basic profile info for event/group UX;
 -- only owners can insert/update their own row.
+drop policy if exists "profiles_select_authenticated" on public.user_profiles;
 create policy "profiles_select_authenticated" on public.user_profiles
   for select using (auth.uid() is not null);
 
+drop policy if exists "profiles_insert_self" on public.user_profiles;
 create policy "profiles_insert_self" on public.user_profiles
   for insert with check (auth.uid() = id);
 
+drop policy if exists "profiles_update_self" on public.user_profiles;
 create policy "profiles_update_self" on public.user_profiles
   for update using (auth.uid() = id);
 
 -- Groups: visible only to members/owners.
+drop policy if exists "groups_select_member_or_owner" on public.groups;
 create policy "groups_select_member_or_owner" on public.groups
   for select using (
     auth.uid() = owner_id
@@ -40,16 +44,20 @@ create policy "groups_select_member_or_owner" on public.groups
     )
   );
 
+drop policy if exists "groups_insert_owner" on public.groups;
 create policy "groups_insert_owner" on public.groups
   for insert with check (auth.uid() = owner_id);
 
+drop policy if exists "groups_update_owner" on public.groups;
 create policy "groups_update_owner" on public.groups
   for update using (auth.uid() = owner_id);
 
+drop policy if exists "groups_delete_owner" on public.groups;
 create policy "groups_delete_owner" on public.groups
   for delete using (auth.uid() = owner_id);
 
 -- Group members: allow self-view and visibility of members in groups you belong to.
+drop policy if exists "group_members_select_related" on public.group_members;
 create policy "group_members_select_related" on public.group_members
   for select using (
     auth.uid() = user_id
@@ -62,6 +70,7 @@ create policy "group_members_select_related" on public.group_members
   );
 
 -- Insert allowed for owner adding members or user joining themselves.
+drop policy if exists "group_members_insert_owner_or_self" on public.group_members;
 create policy "group_members_insert_owner_or_self" on public.group_members
   for insert with check (
     (auth.uid() = user_id)
@@ -73,6 +82,7 @@ create policy "group_members_insert_owner_or_self" on public.group_members
     )
   );
 
+drop policy if exists "group_members_delete_owner_or_self" on public.group_members;
 create policy "group_members_delete_owner_or_self" on public.group_members
   for delete using (
     auth.uid() = user_id
@@ -85,6 +95,7 @@ create policy "group_members_delete_owner_or_self" on public.group_members
   );
 
 -- Events: readable only by group members; editable only by creator.
+drop policy if exists "events_select_group_member" on public.events;
 create policy "events_select_group_member" on public.events
   for select using (
     exists (
@@ -95,6 +106,7 @@ create policy "events_select_group_member" on public.events
     )
   );
 
+drop policy if exists "events_insert_creator" on public.events;
 create policy "events_insert_creator" on public.events
   for insert with check (
     auth.uid() = created_by
@@ -106,14 +118,17 @@ create policy "events_insert_creator" on public.events
     )
   );
 
+drop policy if exists "events_update_creator" on public.events;
 create policy "events_update_creator" on public.events
   for update using (auth.uid() = created_by);
 
+drop policy if exists "events_delete_creator" on public.events;
 create policy "events_delete_creator" on public.events
   for delete using (auth.uid() = created_by);
 
 -- Participants: readable by event group members; insert only for self;
 -- delete by self or event creator.
+drop policy if exists "participants_select_group_member" on public.event_participants;
 create policy "participants_select_group_member" on public.event_participants
   for select using (
     auth.uid() = user_id
@@ -126,6 +141,7 @@ create policy "participants_select_group_member" on public.event_participants
     )
   );
 
+drop policy if exists "participants_insert_self" on public.event_participants;
 create policy "participants_insert_self" on public.event_participants
   for insert with check (
     auth.uid() = user_id
@@ -138,6 +154,7 @@ create policy "participants_insert_self" on public.event_participants
     )
   );
 
+drop policy if exists "participants_delete_self_or_event_creator" on public.event_participants;
 create policy "participants_delete_self_or_event_creator" on public.event_participants
   for delete using (
     auth.uid() = user_id

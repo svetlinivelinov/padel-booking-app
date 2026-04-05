@@ -2,10 +2,10 @@
 
 create extension if not exists "uuid-ossp";
 
-create type event_type as enum ('individual', 'couples');
-create type participant_status as enum ('confirmed', 'waitlisted');
-create type slot_type as enum ('individual', 'couple');
-create type member_role as enum ('owner', 'member');
+do $$ begin create type event_type as enum ('individual', 'couples'); exception when duplicate_object then null; end $$;
+do $$ begin create type participant_status as enum ('confirmed', 'waitlisted'); exception when duplicate_object then null; end $$;
+do $$ begin create type slot_type as enum ('individual', 'couple'); exception when duplicate_object then null; end $$;
+do $$ begin create type member_role as enum ('owner', 'member'); exception when duplicate_object then null; end $$;
 
 create table if not exists public.user_profiles (
   id uuid primary key references auth.users(id) on delete cascade,
@@ -70,6 +70,7 @@ begin
 end;
 $$ language plpgsql security definer;
 
+drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
@@ -81,36 +82,47 @@ alter table public.events enable row level security;
 alter table public.event_participants enable row level security;
 
 -- Minimal policies. Tighten these before production.
+drop policy if exists "profiles_select" on public.user_profiles;
 create policy "profiles_select" on public.user_profiles
   for select using (auth.uid() = id);
 
+drop policy if exists "profiles_upsert" on public.user_profiles;
 create policy "profiles_upsert" on public.user_profiles
   for insert with check (auth.uid() = id);
 
+drop policy if exists "profiles_update" on public.user_profiles;
 create policy "profiles_update" on public.user_profiles
   for update using (auth.uid() = id);
 
+drop policy if exists "groups_select" on public.groups;
 create policy "groups_select" on public.groups
   for select using (true);
 
+drop policy if exists "groups_insert" on public.groups;
 create policy "groups_insert" on public.groups
   for insert with check (auth.uid() is not null);
 
+drop policy if exists "group_members_select" on public.group_members;
 create policy "group_members_select" on public.group_members
   for select using (auth.uid() = user_id);
 
+drop policy if exists "group_members_insert" on public.group_members;
 create policy "group_members_insert" on public.group_members
   for insert with check (auth.uid() = user_id);
 
+drop policy if exists "events_select" on public.events;
 create policy "events_select" on public.events
   for select using (true);
 
+drop policy if exists "events_insert" on public.events;
 create policy "events_insert" on public.events
   for insert with check (auth.uid() = created_by);
 
+drop policy if exists "participants_select" on public.event_participants;
 create policy "participants_select" on public.event_participants
   for select using (auth.uid() = user_id);
 
+drop policy if exists "participants_insert" on public.event_participants;
 create policy "participants_insert" on public.event_participants
   for insert with check (auth.uid() = user_id);
 
