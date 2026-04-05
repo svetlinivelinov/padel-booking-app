@@ -333,6 +333,110 @@ export async function listGroupEvents(groupId) {
   return data;
 }
 
+export async function listOwnedGroups(userId) {
+  const { data, error } = await supabase
+    .from("groups")
+    .select("*")
+    .eq("owner_id", userId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    throw error;
+  }
+
+  return data || [];
+}
+
+export async function updateGroup(groupId, updates) {
+  const userId = await getCurrentUserId();
+  if (!userId) throw new Error("Please sign in");
+
+  const { data: current, error: currentError } = await supabase
+    .from("groups")
+    .select("id, owner_id")
+    .eq("id", groupId)
+    .maybeSingle();
+
+  if (currentError) throw currentError;
+  if (!current) throw new Error("Group not found");
+  if (current.owner_id !== userId) {
+    throw new Error("Only the group owner can update this group");
+  }
+
+  const { data, error } = await supabase
+    .from("groups")
+    .update(updates)
+    .eq("id", groupId)
+    .select("*")
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
+export async function listGroupMembers(groupId) {
+  const { data, error } = await supabase
+    .from("group_members")
+    .select("id, group_id, user_id, role, created_at")
+    .eq("group_id", groupId)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    throw error;
+  }
+
+  const rows = data || [];
+  if (rows.length === 0) return [];
+
+  const userIds = [...new Set(rows.map((m) => m.user_id).filter(Boolean))];
+  const { data: profiles, error: profilesError } = await supabase
+    .from("user_profiles")
+    .select("id, display_name, username")
+    .in("id", userIds);
+
+  if (profilesError) {
+    throw profilesError;
+  }
+
+  return rows.map((m) => ({
+    ...m,
+    user:
+      profiles?.find((p) => p.id === m.user_id) ||
+      { display_name: null, username: m.user_id?.slice(0, 8) || "member" },
+  }));
+}
+
+export async function removeGroupMember(groupId, memberUserId) {
+  const { error } = await supabase
+    .from("group_members")
+    .delete()
+    .eq("group_id", groupId)
+    .eq("user_id", memberUserId);
+
+  if (error) throw error;
+}
+
+export async function deleteGroup(groupId) {
+  const { error } = await supabase
+    .from("groups")
+    .delete()
+    .eq("id", groupId);
+
+  if (error) throw error;
+}
+
+export async function deleteEvent(eventId) {
+  const { error } = await supabase
+    .from("events")
+    .delete()
+    .eq("id", eventId);
+
+  if (error) throw error;
+}
+
 export async function getEvent(eventId) {
   const { data, error } = await supabase
     .from("events")

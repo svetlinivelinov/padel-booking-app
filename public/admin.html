@@ -20,19 +20,137 @@
         <a class="nav-link" href="/court.html">Court</a>
         <a class="nav-link" href="/results.html">Results</a>
         <a class="nav-link" href="/profile.html">Profile</a>
+        <a class="nav-link active" href="/admin.html">Admin</a>
       </div>
     </div>
   </nav>
 
-  <section class="py-5">
-    <div class="container">
-      <div class="hero-card">
-        <h2 class="section-title">Admin console</h2>
-        <p class="mt-3">Moderation and analytics controls will live here.</p>
-        <span class="badge badge-role">Admin</span>
+  <main class="app-container">
+    <section class="py-5">
+      <div class="container mb-2">
+        <h1 class="page-title">Admin Console</h1>
+        <p class="page-subtitle">Moderate groups, members, and events from one place</p>
       </div>
-    </div>
-  </section>
+      <div class="container">
+        <div class="hero-card mb-4">
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+              <h2 class="section-title mb-1">Access</h2>
+              <p id="admin-role-hint" class="text-muted mb-0">Checking your permissions...</p>
+            </div>
+            <span id="admin-role-badge" class="badge badge-role">PLAYER</span>
+          </div>
+          <p id="admin-panel-status" class="form-status mt-3 mb-0"></p>
+        </div>
+
+        <div class="row g-3 mb-4">
+          <div class="col-6 col-lg-3">
+            <div class="list-card admin-kpi-card">
+              <div class="admin-kpi-label">Owned groups</div>
+              <div id="kpi-owned-groups" class="admin-kpi-value">0</div>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="list-card admin-kpi-card">
+              <div class="admin-kpi-label">Group events</div>
+              <div id="kpi-group-events" class="admin-kpi-value">0</div>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="list-card admin-kpi-card">
+              <div class="admin-kpi-label">Confirmed slots</div>
+              <div id="kpi-confirmed-players" class="admin-kpi-value">0</div>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="list-card admin-kpi-card">
+              <div class="admin-kpi-label">Waitlisted slots</div>
+              <div id="kpi-waitlisted-players" class="admin-kpi-value">0</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-12 col-xl-4">
+            <div class="hero-card h-100">
+              <h2 class="section-title">Group Settings</h2>
+              <form id="admin-group-form" class="mt-3">
+                <div class="mb-3">
+                  <label class="form-label" for="admin-group-select">Select owned group</label>
+                  <select id="admin-group-select" class="form-select"></select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label" for="admin-group-name">Group name</label>
+                  <input id="admin-group-name" class="form-control" type="text" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label" for="admin-group-description">Description</label>
+                  <textarea id="admin-group-description" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                  <button class="btn btn-sun" type="submit">Save group</button>
+                  <button id="admin-delete-group" class="btn btn-ghost btn-ghost-danger" type="button">Delete group</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="col-12 col-xl-8">
+            <div class="hero-card mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h2 class="section-title mb-0">Members</h2>
+                <span class="text-muted small">Owner can remove members</span>
+              </div>
+              <div class="table-responsive admin-table-wrap">
+                <table class="table table-sm admin-table mb-0">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Username</th>
+                      <th>Role</th>
+                      <th>Joined</th>
+                      <th class="text-end">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-members-body"></tbody>
+                </table>
+              </div>
+              <div id="admin-members-empty" class="empty-state py-4">
+                <div class="empty-state-title">No members in this group</div>
+              </div>
+            </div>
+
+            <div class="hero-card">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h2 class="section-title mb-0">Events</h2>
+                <span class="text-muted small">Close or delete events you manage</span>
+              </div>
+              <div class="table-responsive admin-table-wrap">
+                <table class="table table-sm admin-table mb-0">
+                  <thead>
+                    <tr>
+                      <th>Event</th>
+                      <th>Status</th>
+                      <th>Confirmed</th>
+                      <th>Waitlist</th>
+                      <th class="text-end">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-events-body"></tbody>
+                </table>
+              </div>
+              <div id="admin-events-empty" class="empty-state py-4">
+                <div class="empty-state-title">No events in this group</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/assets/js/env.js"></script>
+  <script type="module" src="/assets/js/admin.js?v=20260405"></script>
 </body>
 </html>
 

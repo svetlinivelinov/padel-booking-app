@@ -544,6 +544,17 @@ select.form-select {
   transform: scale(0.97);
 }
 
+.btn-ghost-danger {
+  color: var(--danger-light);
+  border-color: var(--danger-border);
+}
+
+.btn-ghost-danger:hover {
+  color: var(--danger-light);
+  border-color: var(--danger);
+  background: var(--danger-bg);
+}
+
 /* Lightweight icon treatment for action buttons */
 .btn-icon {
   display: inline-flex;
@@ -1327,4 +1338,86 @@ details[open] > .past-events-summary::before { transform: rotate(90deg); }
 .results-table td {
   font-size: 0.85rem;
   vertical-align: middle;
+}
+
+/* -- Admin panel ------------------------------------------------------------- */
+.admin-kpi-card {
+  padding: 1rem 1.1rem;
+  min-height: 110px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.admin-kpi-label {
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.admin-kpi-value {
+  font-size: 1.9rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--text-primary);
+}
+
+.admin-table-wrap {
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--bg-surface-elevated);
+}
+
+.admin-table {
+  margin: 0;
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--text-secondary);
+  --bs-table-border-color: var(--divider);
+}
+
+.admin-table th,
+.admin-table td {
+  font-size: 0.82rem;
+  vertical-align: middle;
+  border-color: var(--divider);
+}
+
+.admin-table th {
+  font-weight: 600;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.admin-actions-cell {
+  white-space: nowrap;
+}
+
+.admin-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  border: 1px solid var(--border-soft);
+}
+
+.admin-chip-soft {
+  color: var(--accent-light);
+  background: var(--accent-bg);
+  border-color: var(--accent-glow);
+}
+
+.admin-chip-live {
+  color: var(--success-light);
+  background: var(--success-bg);
+  border-color: var(--success-border);
+}
+
+.admin-chip-muted {
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.04);
 }
