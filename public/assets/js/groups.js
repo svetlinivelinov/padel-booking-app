@@ -1,16 +1,11 @@
 import { requireAuth } from "./auth.js";
 import {
-  createGroup,
-  addGroupMember,
   joinGroupByToken,
   listMyGroups,
 } from "./database.js";
 
-const createForm = document.querySelector("#group-create-form");
-const status = document.querySelector("#group-status");
-
-// ── Safe status helper — works even if #group-status doesn't exist on the page
-const setStatus = (msg) => { if (status) status.textContent = msg; };
+const inviteStatus = document.querySelector("#group-status");
+const setStatus = (msg) => { if (inviteStatus) inviteStatus.textContent = msg; };
 
 // ── Invite link handler ───────────────────────────────────────────────────────
 (async () => {
@@ -104,17 +99,30 @@ export async function refreshGroups() {
 
     select.innerHTML = "";
 
-    if (groups.length === 0) {
-      select.innerHTML = `<option value="">No groups found</option>`;
-      return;
-    }
-
     groups.forEach((group) => {
       const option = document.createElement("option");
       option.value = group.id;
       option.textContent = group.name;
       select.appendChild(option);
     });
+
+    if (selector === "#event-group") {
+      const newOpt = document.createElement("option");
+      newOpt.value = "__new__";
+      newOpt.textContent = "+ Create new group";
+      select.appendChild(newOpt);
+    }
+
+    if (groups.length === 0) {
+      if (selector === "#event-group") {
+        // No existing groups — auto-open the inline create panel
+        select.value = "__new__";
+        select.dispatchEvent(new Event("change"));
+      } else {
+        select.innerHTML = `<option value="">No groups found</option>`;
+      }
+      return;
+    }
 
     // If a valid group id was requested via URL, use it; otherwise fall back to the first group
     if (requestedGroup && groups.find(g => g.id === requestedGroup)) {
@@ -128,38 +136,6 @@ export async function refreshGroups() {
     }
   });
 }
-
-// ── Create group ──────────────────────────────────────────────────────────────
-async function handleCreate(e) {
-  e.preventDefault();
-  const user = await requireAuth();
-  if (!user) return;
-
-  const btn = createForm.querySelector("button[type=submit]");
-  btn.disabled = true;
-  setStatus("Creating group...");
-
-  try {
-    const name = createForm.querySelector("#group-name").value.trim();
-    const description = createForm.querySelector("#group-description").value.trim();
-
-    if (!name) throw new Error("Group name is required");
-
-    const group = await createGroup({ name, description });
-    await addGroupMember(group.id, user.id, "owner");
-
-    setStatus(`Group "${name}" created successfully.`);
-    createForm.reset();
-    await refreshGroups();
-  } catch (err) {
-    setStatus(err.message);
-  } finally {
-    btn.disabled = false;
-  }
-}
-
-// ── Event listeners ───────────────────────────────────────────────────────────
-createForm?.addEventListener("submit", handleCreate);
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 refreshGroups();

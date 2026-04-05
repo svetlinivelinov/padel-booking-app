@@ -7,6 +7,8 @@ setInterval(() => {
 
 import {
   createEvent,
+  createGroup,
+  addGroupMember,
   listMyGroups,
   listGroupEvents,
   joinEvent,
@@ -16,11 +18,21 @@ import {
   getEventParticipants,
   getCurrentUserId,
 } from "./database.js";
+import { refreshGroups } from "./groups.js";
 
-const form        = document.querySelector("#event-create-form");
-const list        = document.querySelector("#event-list");
-const status      = document.querySelector("#event-status");
-const groupSelect = document.querySelector("#event-group");
+const form             = document.querySelector("#event-create-form");
+const list             = document.querySelector("#event-list");
+const status           = document.querySelector("#event-status");
+const groupSelect      = document.querySelector("#event-group");
+const newGroupFields   = document.querySelector("#new-group-fields");
+const inlineGroupName  = document.querySelector("#inline-group-name");
+const inlineGroupDesc  = document.querySelector("#inline-group-description");
+
+function toggleNewGroupFields(show) {
+  if (!newGroupFields) return;
+  newGroupFields.style.display = show ? "" : "none";
+  if (inlineGroupName) inlineGroupName.required = show;
+}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const setStatus = (msg) => { if (status) status.textContent = msg; };
@@ -286,6 +298,7 @@ async function renderEventCard(event, userId, groupInviteToken) {
     form.querySelector("#event-max").value  = event.max_participants;
     form.querySelector("#event-desc").value = event.description || "";
     form.querySelector("#event-type").value = event.type;
+    if (form.querySelector("#event-format")) form.querySelector("#event-format").value = event.game_format || "americano";
     if (form.querySelector("#event-location")) form.querySelector("#event-location").value = event.location || "";
     if (form.querySelector("#event-notes")) form.querySelector("#event-notes").value = event.notes || "";
     setStatus("Editing event — make changes and save.");
@@ -302,7 +315,7 @@ async function renderEventCard(event, userId, groupInviteToken) {
 // ── Refresh ───────────────────────────────────────────────────────────────────
 export async function refreshEvents() {
   const currentVersion = ++refreshVersion;
-  if (!list || !groupSelect || !groupSelect.value) return;
+  if (!list || !groupSelect || !groupSelect.value || groupSelect.value === "__new__") return;
 
   const userId = await getCurrentUserId();
   if (currentVersion !== refreshVersion) return;
@@ -388,6 +401,7 @@ async function handleCreate(e) {
   if (dateValue && dateValue.length === 16) dateValue += ":00";
 
   const eventType       = form.querySelector("#event-type").value;
+  const eventFormat     = form.querySelector("#event-format")?.value || "americano";
   const maxParticipants = Number(form.querySelector("#event-max").value);
   const eventDate       = new Date(dateValue);
   // Convert local time to UTC ISO string so Supabase stores the correct moment
@@ -406,12 +420,27 @@ async function handleCreate(e) {
     setStatus("Event date must be in the future."); btn.disabled = false; return;
   }
 
+  // ── Resolve group — create inline if user chose "+ Create new group" ────────
+  let resolvedGroupId = groupSelect.value;
+  if (resolvedGroupId === "__new__") {
+    const newName = inlineGroupName?.value.trim();
+    if (!newName) { setStatus("Group name is required."); btn.disabled = false; return; }
+    try {
+      const grp = await createGroup({ name: newName, description: inlineGroupDesc?.value.trim() || "" });
+      await addGroupMember(grp.id, user.id, "owner");
+      resolvedGroupId = grp.id;
+    } catch (err) {
+      setStatus("Failed to create group: " + err.message); btn.disabled = false; return;
+    }
+  }
+
   const payload = {
-    group_id:         groupSelect.value,
+    group_id:         resolvedGroupId,
     date_time:        dateValue,
     max_participants: maxParticipants,
     description:      form.querySelector("#event-desc").value.trim(),
     type:             eventType,
+    game_format:      eventFormat,
     location:         form.querySelector("#event-location")?.value.trim() || null,
     notes:            form.querySelector("#event-notes")?.value.trim() || null,
   };
@@ -426,9 +455,11 @@ async function handleCreate(e) {
       await createEvent({ ...payload, created_by: user.id });
       setStatus("Event created.");
     }
-    const savedGroup = groupSelect.value;
+    const savedGroup = resolvedGroupId;
     form.reset();
-    groupSelect.value = savedGroup;
+    toggleNewGroupFields(false);
+    await refreshGroups();
+    if (savedGroup) groupSelect.value = savedGroup;
     await refreshEvents();
   } catch (err) {
     setStatus(err.message);
@@ -438,5 +469,8 @@ async function handleCreate(e) {
 }
 
 form?.addEventListener("submit", handleCreate);
-groupSelect?.addEventListener("change", refreshEvents);
+groupSelect?.addEventListener("change", () => {
+  toggleNewGroupFields(groupSelect.value === "__new__");
+  if (groupSelect.value !== "__new__") refreshEvents();
+});
 refreshEvents();

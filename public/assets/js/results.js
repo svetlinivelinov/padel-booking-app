@@ -77,7 +77,10 @@ async function loadResults() {
         const participants = await getEventParticipants(event.id);
         const profiles = {};
         participants.filter(p => p.status === "confirmed").forEach(p => {
-          profiles[p.user_id] = p.user?.display_name || p.user?.username || "Player";
+          const name = p.user?.display_name || p.user?.username || "Player";
+          profiles[p.user_id] = (event.type === "couples" && p.partner_name)
+            ? `${name} / ${p.partner_name}`
+            : name;
         });
 
         const scores = await getLeaderboard(event.id);
@@ -116,7 +119,9 @@ async function loadResults() {
             <td>${medals[i] || i + 1}</td>
             <td>${row.name}${isMe ? ' <span class="badge bg-success" style="font-size:0.65rem;">You</span>' : ""}</td>
             <td><strong>${row.points}</strong></td>
-            <td>${row.played}</td>
+            <td>${row.wins ?? 0}</td>
+            <td>${row.ties ?? 0}</td>
+            <td>${row.losses ?? 0}</td>
           </tr>`;
       }).join("");
 
@@ -137,7 +142,7 @@ async function loadResults() {
           <div class="table-responsive mt-2">
             <table class="table table-sm results-table mb-0">
               <thead>
-                <tr><th>#</th><th>Player</th><th>Points</th><th>Played</th></tr>
+                <tr><th>#</th><th>Player</th><th>Points</th><th>W</th><th>T</th><th>L</th></tr>
               </thead>
               <tbody>${tableRows}</tbody>
             </table>
@@ -152,11 +157,14 @@ async function loadResults() {
       for (const lb of Object.values(dataCache[group.id].leaderboards)) {
         for (const row of lb) {
           if (!groupTotals[row.userId]) {
-            groupTotals[row.userId] = { name: row.name, points: 0, played: 0, events: 0 };
+            groupTotals[row.userId] = { name: row.name, points: 0, played: 0, wins: 0, ties: 0, losses: 0, events: 0 };
           }
-          groupTotals[row.userId].points += row.points;
-          groupTotals[row.userId].played += row.played;
-          groupTotals[row.userId].events += 1;
+          groupTotals[row.userId].points  += row.points;
+          groupTotals[row.userId].played  += row.played;
+          groupTotals[row.userId].wins    += row.wins   ?? 0;
+          groupTotals[row.userId].ties    += row.ties   ?? 0;
+          groupTotals[row.userId].losses  += row.losses ?? 0;
+          groupTotals[row.userId].events  += 1;
         }
       }
 
@@ -173,6 +181,9 @@ async function loadResults() {
               <td><strong>${data.points}</strong></td>
               <td>${data.events}</td>
               <td>${data.played}</td>
+              <td>${data.wins}</td>
+              <td>${data.ties}</td>
+              <td>${data.losses}</td>
               <td>${avg}</td>
             </tr>`;
         }).join("");
@@ -192,6 +203,9 @@ async function loadResults() {
                   <th>Total pts</th>
                   <th>Events</th>
                   <th>Matches</th>
+                  <th>W</th>
+                  <th>T</th>
+                  <th>L</th>
                   <th>Avg pts</th>
                 </tr>
               </thead>
@@ -207,7 +221,7 @@ async function loadResults() {
             <span class="badge bg-primary-subtle text-primary-emphasis">${eventBlocks.length} event${eventBlocks.length !== 1 ? "s" : ""}</span>
           </div>
           ${rankingSection}
-          <details class="results-events-details">
+          <details class="results-events-details" ${rankingSection ? "" : "open"}>
             <summary class="results-ranking-summary mb-2">
               <span class="results-ranking-title">📋 Results by event</span>
             </summary>

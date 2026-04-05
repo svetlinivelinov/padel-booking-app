@@ -4,11 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Redirecting - Bokacourt</title>
-  <meta http-equiv="refresh" content="0; url=/event.html?createGroup=1">
+  <meta http-equiv="refresh" content="0; url=/event.html">
 </head>
 <body>
   <script>
-    window.location.replace("/event.html?createGroup=1");
+    // Preserve invite/event query params so invite links land correctly
+    const qs = window.location.search;
+    window.location.replace("/event.html" + qs);
   </script>
 </body>
 </html>

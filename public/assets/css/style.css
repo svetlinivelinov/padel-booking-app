@@ -1103,8 +1103,8 @@ hr, .divider {
 .results-ranking-summary::-webkit-details-marker { display: none; }
 
 .results-ranking-summary::before {
-  content: "?";
-  font-size: 0.65rem;
+  content: "›";
+  font-size: 1rem;
   color: var(--text-muted, #7f9bbf);
   transition: transform 160ms ease;
 }
@@ -1366,12 +1366,14 @@ details[open] > .past-events-summary::before { transform: rotate(90deg); }
 .admin-table-wrap {
   border: 1px solid var(--border-soft);
   border-radius: 12px;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
   background: var(--bg-surface-elevated);
 }
 
 .admin-table {
   margin: 0;
+  min-width: 840px;
   --bs-table-bg: transparent;
   --bs-table-color: var(--text-secondary);
   --bs-table-border-color: var(--divider);
@@ -1391,7 +1393,14 @@ details[open] > .past-events-summary::before { transform: rotate(90deg); }
 }
 
 .admin-actions-cell {
-  white-space: nowrap;
+  white-space: normal;
+}
+
+.admin-actions-wrap {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  flex-wrap: wrap;
 }
 
 .admin-chip {
@@ -1420,4 +1429,31 @@ details[open] > .past-events-summary::before { transform: rotate(90deg); }
 .admin-chip-muted {
   color: var(--text-muted);
   background: rgba(255, 255, 255, 0.04);
+}
+
+@media (max-width: 767px) {
+  .admin-kpi-card {
+    min-height: 92px;
+    padding: 0.8rem 0.9rem;
+  }
+
+  .admin-kpi-value {
+    font-size: 1.55rem;
+  }
+
+  .admin-table {
+    min-width: 700px;
+  }
+
+  .admin-table th,
+  .admin-table td {
+    font-size: 0.76rem;
+    padding: 0.45rem 0.4rem;
+  }
+
+  .admin-actions-wrap .btn {
+    min-height: 34px;
+    padding: 0.35rem 0.55rem;
+    font-size: 0.74rem;
+  }
 }

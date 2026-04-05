@@ -19,6 +19,9 @@ A vanilla JS + Supabase scaffold for the Bokacourt flow described in the archite
 	- supabase/migrations/006_user_roles_and_admin_seed.sql
 	- supabase/migrations/007_harden_admin_seed_matching.sql
 	- supabase/migrations/008_admin_console_rpcs.sql
+	- supabase/migrations/009_fix_admin_rpc_return_types.sql
+	- supabase/migrations/010_admin_delete_event_rpc.sql
+	- supabase/migrations/011_admin_finalize_event_rpc.sql
 3) For local dev, set your keys in public/assets/js/env.js.
 4) Keep real credentials out of git (public/assets/js/env.js is in .gitignore).
 5) Serve the public/ folder with a static server (VS Code Live Server works well).
@@ -61,7 +64,7 @@ A vanilla JS + Supabase scaffold for the Bokacourt flow described in the archite
 
 ## Commit Checklist
 1) Confirm `public/assets/js/config.js` does not contain hardcoded Supabase keys.
-2) Confirm your database has migrations 001, 002, 003, 004, 005, 006, 007, and 008 applied.
+2) Confirm your database has migrations 001, 002, 003, 004, 005, 006, 007, 008, 009, 010, and 011 applied.
 3) Confirm `public/assets/js/env.js` is ignored by git and not committed with real secrets.
 4) Confirm GitHub repository secrets for migration automation are configured.
 

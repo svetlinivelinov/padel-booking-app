@@ -60,7 +60,7 @@ async function loadGroups() {
         <div class="empty-state">
           <div class="empty-state-title">No groups yet</div>
           <div class="empty-state-desc">Create your first group to unlock Upcoming events.</div>
-          <a href="/event.html?createGroup=1" class="btn btn-sun btn-sm" style="margin-top:0.5rem;">Create group</a>
+          <a href="/event.html" class="btn btn-sun btn-sm" style="margin-top:0.5rem;">Create event</a>
         </div>`;
     }
     return;

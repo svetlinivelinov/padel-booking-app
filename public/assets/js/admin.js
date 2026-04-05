@@ -1,5 +1,5 @@
 import { requireAuth, getUserRole } from "./auth.js";
-import * as db from "./database.js";
+import * as db from "./database.js?v=20260407";
 
 const {
   listOwnedGroups,
@@ -14,6 +14,10 @@ const {
   adminListGroupEvents,
   adminListEventParticipants,
   adminListUsers,
+  adminDeleteEvent,
+  adminFinalizeEvent,
+  adminAddParticipant,
+  adminSimulateGame,
 } = db;
 
 const deleteEvent = db.deleteEvent;
@@ -43,6 +47,15 @@ const eventsEmpty = document.querySelector("#admin-events-empty");
 const usersSection = document.querySelector("#admin-users-section");
 const usersBody = document.querySelector("#admin-users-body");
 const usersEmpty = document.querySelector("#admin-users-empty");
+
+const simSection          = document.querySelector("#admin-simulate-section");
+const simEventSelect      = document.querySelector("#sim-event-select");
+const simUsersCheckboxes  = document.querySelector("#sim-users-checkboxes");
+const simAddBtn           = document.querySelector("#sim-add-btn");
+const simRunBtn           = document.querySelector("#sim-run-btn");
+const simStatus           = document.querySelector("#sim-status");
+const simParticipantCount = document.querySelector("#sim-participant-count");
+const simResultsLink      = document.querySelector("#sim-results-link");
 
 let currentUser = null;
 let currentRole = "player";
@@ -279,8 +292,10 @@ function renderEvents(events, participantsMap) {
       const confirmed = participants.filter((p) => p.status === "confirmed").length;
       const waitlisted = participants.filter((p) => p.status === "waitlisted").length;
       const canModerateEvent = event.created_by === currentUser.id;
-      const canFinalize = canModerateEvent && eventStateLabel(event) !== "Finished";
-      const canDeleteEvent = canModerateEvent && typeof deleteEvent === "function";
+      const canAdminFinalizeEvent = isAdmin() && typeof adminFinalizeEvent === "function";
+      const canAdminDeleteEvent = isAdmin() && typeof adminDeleteEvent === "function";
+      const canFinalize = (canModerateEvent || canAdminFinalizeEvent) && eventStateLabel(event) !== "Finished";
+      const canDeleteEvent = canAdminDeleteEvent || (canModerateEvent && typeof deleteEvent === "function");
 
       return `
         <tr>
@@ -292,6 +307,7 @@ function renderEvents(events, participantsMap) {
           <td>${confirmed}/${escapeHtml(String(event.max_participants ?? "-"))}</td>
           <td>${waitlisted}</td>
           <td class="text-end admin-actions-cell">
+            <div class="admin-actions-wrap">
             <a class="btn btn-sm btn-ghost" href="/event.html?group=${encodeURIComponent(selectedGroup.id)}&event=${encodeURIComponent(event.id)}">Open</a>
             ${
               canFinalize
@@ -303,6 +319,7 @@ function renderEvents(events, participantsMap) {
                 ? `<button class="btn btn-sm btn-ghost btn-ghost-danger" data-delete-event="${event.id}">Delete</button>`
                 : ""
             }
+            </div>
           </td>
         </tr>
       `;
@@ -318,7 +335,11 @@ function renderEvents(events, participantsMap) {
 
       btn.disabled = true;
       try {
-        await finalizeEvent(eventId);
+        if (isAdmin() && typeof adminFinalizeEvent === "function") {
+          await adminFinalizeEvent(eventId);
+        } else {
+          await finalizeEvent(eventId);
+        }
         setStatus("Event closed.", "success");
         await loadSummaryAndTables();
       } catch (error) {
@@ -338,10 +359,13 @@ function renderEvents(events, participantsMap) {
 
       btn.disabled = true;
       try {
-        if (typeof deleteEvent !== "function") {
+        if (isAdmin() && typeof adminDeleteEvent === "function") {
+          await adminDeleteEvent(eventId);
+        } else if (typeof deleteEvent === "function") {
+          await deleteEvent(eventId);
+        } else {
           throw new Error("Delete event is unavailable until the latest assets are loaded.");
         }
-        await deleteEvent(eventId);
         setStatus("Event deleted.", "success");
         await loadSummaryAndTables();
       } catch (error) {
@@ -349,6 +373,93 @@ function renderEvents(events, participantsMap) {
         btn.disabled = false;
       }
     });
+  });
+}
+
+async function initSimulateSection() {
+  if (!simSection || !isAdmin()) return;
+  simSection.style.display = "block";
+
+  // Load all events across all visible groups
+  const allEvents = [];
+  for (const group of visibleGroups) {
+    try {
+      const events = await adminListGroupEvents(group.id);
+      events.forEach(e => allEvents.push({ ...e, groupName: group.name }));
+    } catch { /* skip */ }
+  }
+  allEvents.sort((a, b) => new Date(b.date_time) - new Date(a.date_time));
+
+  simEventSelect.innerHTML = allEvents.length === 0
+    ? '<option value="">No events found — create one first</option>'
+    : allEvents.map(e => {
+        const label = `[${escapeHtml(e.groupName)}] ${escapeHtml(e.description || "Event")} — ${new Date(e.date_time).toLocaleDateString()}`;
+        return `<option value="${escapeHtml(e.id)}">${label}</option>`;
+      }).join("");
+
+  // Populate user checkboxes from the already-loaded users list
+  simUsersCheckboxes.innerHTML = loadedUsers.map(u => {
+    const name = escapeHtml(u.display_name || u.username || "User");
+    return `<label class="d-flex align-items-center gap-1 small" style="cursor:pointer;white-space:nowrap">
+      <input type="checkbox" value="${escapeHtml(u.id)}" class="form-check-input m-0"> ${name}
+    </label>`;
+  }).join("");
+
+  const setSimStatus = (msg, cls = "") => {
+    if (!simStatus) return;
+    simStatus.textContent = msg;
+    simStatus.className = "form-status mt-2 mb-0" + (cls ? " " + cls : "");
+  };
+
+  const refreshParticipantCount = async () => {
+    const eventId = simEventSelect?.value;
+    if (!eventId || !simParticipantCount) return;
+    try {
+      const parts = await adminListEventParticipants(eventId);
+      const confirmed = parts.filter(p => p.status === "confirmed").length;
+      simParticipantCount.textContent = `${confirmed} confirmed participant${confirmed !== 1 ? "s" : ""} currently`;
+    } catch { simParticipantCount.textContent = ""; }
+  };
+
+  simEventSelect?.addEventListener("change", refreshParticipantCount);
+  await refreshParticipantCount();
+
+  simAddBtn?.addEventListener("click", async () => {
+    const eventId = simEventSelect?.value;
+    if (!eventId) { setSimStatus("Select an event first.", "error"); return; }
+    const checked = [...(simUsersCheckboxes?.querySelectorAll("input:checked") ?? [])].map(el => el.value);
+    if (checked.length === 0) { setSimStatus("Select at least one user.", "error"); return; }
+
+    simAddBtn.disabled = true;
+    setSimStatus(`Adding ${checked.length} participant(s)...`);
+    let added = 0, failed = 0;
+    for (const userId of checked) {
+      try { await adminAddParticipant(eventId, userId); added++; }
+      catch { failed++; }
+    }
+    simAddBtn.disabled = false;
+    setSimStatus(`Done: ${added} added${failed ? `, ${failed} failed` : ""}.`, added > 0 ? "success" : "error");
+    await refreshParticipantCount();
+  });
+
+  simRunBtn?.addEventListener("click", async () => {
+    const eventId = simEventSelect?.value;
+    if (!eventId) { setSimStatus("Select an event first.", "error"); return; }
+    if (!window.confirm("This will generate all rounds with random scores and mark the event as Finished. Continue?")) return;
+
+    simRunBtn.disabled = true;
+    setSimStatus("Simulating game...");
+    try {
+      const result = await adminSimulateGame(eventId);
+      setSimStatus(`✓ ${result}`, "success");
+      if (simResultsLink) simResultsLink.style.display = "";
+    } catch (err) {
+      setSimStatus(err.message || "Simulation failed.", "error");
+    } finally {
+      simRunBtn.disabled = false;
+    }
+    await loadSummaryAndTables();
+    await refreshParticipantCount();
   });
 }
 
@@ -403,6 +514,7 @@ async function init() {
 
   renderGroupSelect();
   await onGroupChange(selectedGroup?.id || "");
+  await initSimulateSection();
 
   if (visibleGroups.length === 0) {
     setStatus(isAdmin() ? "No groups found in database." : "No groups owned yet. Create one from the Events page.");

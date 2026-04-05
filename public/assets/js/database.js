@@ -107,19 +107,36 @@ export async function getLeaderboard(eventId) {
   if (error) throw error;
   if (!matches || matches.length === 0) return {};
   const scores = {};
-  const addPoints = (userId, pts) => {
+  const addResult = (userId, myPts, oppPts) => {
     if (!userId) return;
-    if (!scores[userId]) scores[userId] = { points: 0, played: 0 };
-    scores[userId].points += pts;
+    if (!scores[userId]) scores[userId] = { points: 0, played: 0, wins: 0, ties: 0, losses: 0 };
+    scores[userId].points += myPts;
     scores[userId].played += 1;
+    if (myPts > oppPts) scores[userId].wins += 1;
+    else if (myPts === oppPts) scores[userId].ties += 1;
+    else scores[userId].losses += 1;
   };
   for (const m of matches) {
-    addPoints(m.team_a_p1, m.score_a ?? 0);
-    addPoints(m.team_a_p2, m.score_a ?? 0);
-    addPoints(m.team_b_p1, m.score_b ?? 0);
-    addPoints(m.team_b_p2, m.score_b ?? 0);
+    const sa = m.score_a ?? 0;
+    const sb = m.score_b ?? 0;
+    addResult(m.team_a_p1, sa, sb);
+    addResult(m.team_a_p2, sa, sb);
+    addResult(m.team_b_p1, sb, sa);
+    addResult(m.team_b_p2, sb, sa);
   }
   return scores;
+}
+
+export async function getAllMatches(eventId) {
+  const { data, error } = await supabase
+    .from("matches")
+    .select("*")
+    .eq("event_id", eventId)
+    .eq("status", "completed")
+    .order("round_number", { ascending: true })
+    .order("court_number", { ascending: true });
+  if (error) throw error;
+  return data || [];
 }
 
 export async function getCurrentRound(eventId) {
@@ -486,6 +503,39 @@ export async function adminListUsers() {
   const { data, error } = await supabase.rpc("admin_list_users");
   if (error) throw error;
   return data || [];
+}
+
+export async function adminDeleteEvent(eventId) {
+  const { data, error } = await supabase.rpc("admin_delete_event", {
+    p_event_id: eventId,
+  });
+  if (error) throw error;
+  return Boolean(data);
+}
+
+export async function adminFinalizeEvent(eventId) {
+  const { data, error } = await supabase.rpc("admin_finalize_event", {
+    p_event_id: eventId,
+  });
+  if (error) throw error;
+  return Boolean(data);
+}
+
+export async function adminAddParticipant(eventId, userId) {
+  const { data, error } = await supabase.rpc("admin_add_participant", {
+    p_event_id: eventId,
+    p_user_id:  userId,
+  });
+  if (error) throw error;
+  return Boolean(data);
+}
+
+export async function adminSimulateGame(eventId) {
+  const { data, error } = await supabase.rpc("admin_simulate_game", {
+    p_event_id: eventId,
+  });
+  if (error) throw error;
+  return String(data);
 }
 
 export async function getEvent(eventId) {

@@ -7,6 +7,7 @@ import {
   startGame,
   generateRound,
   getMatches,
+  getAllMatches,
   submitScore,
   getLeaderboard,
   getCurrentRound,
@@ -14,6 +15,7 @@ import {
   finalizeEvent,
 } from "./database.js";
 import { generateAmericanoRounds } from "./americano.js";
+import { generateMexicanoNextRound } from "./mexicano.js";
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let currentEvent = null;
@@ -104,7 +106,10 @@ async function loadCourt() {
   const confirmed = participants.filter(p => p.status === "confirmed");
   playerProfiles = {};
   confirmed.forEach(p => {
-    playerProfiles[p.user_id] = p.user?.display_name || p.user?.username || "Player";
+    const name = p.user?.display_name || p.user?.username || "Player";
+    playerProfiles[p.user_id] = (currentEvent.type === "couples" && p.partner_name)
+      ? `${name} / ${p.partner_name}`
+      : name;
   });
 
   const isOrganizer = currentEvent.created_by === currentUser.id;
@@ -121,8 +126,8 @@ async function loadCourt() {
     // Show final summary screen
     await renderFinalScreen(isOrganizer);
   } else if (gameStatus === "active") {
-    // Regenerate allRounds if empty (page refresh mid-game)
-    if (allRounds.length === 0 && currentEvent.total_rounds) {
+    // Regenerate allRounds if empty (page refresh mid-game) — Americano only
+    if (currentEvent.game_format !== "mexicano" && allRounds.length === 0 && currentEvent.total_rounds) {
       const courts = Math.max(1, Math.floor(Object.keys(playerProfiles).length / 4));
       allRounds = generateAmericanoRounds(Object.keys(playerProfiles), currentEvent.total_rounds, courts);
     }
@@ -176,13 +181,21 @@ startBtn.addEventListener("click", async () => {
     }
 
     const playerIds = Object.keys(playerProfiles);
-    allRounds = generateAmericanoRounds(playerIds, totalRounds, courts);
+    const isMexicano = currentEvent.game_format === "mexicano";
 
-    // Save game settings — this also sets game_status = 'active'
-    await startGame(currentEvent.id, pointsPerMatch, totalRounds);
-
-    // Only generate round 1 — subsequent rounds generated on demand
-    await generateRound(currentEvent.id, 1, allRounds[0]);
+    if (isMexicano) {
+      // Mexicano: round 1 is random; subsequent rounds generated on demand from live scores
+      allRounds = [];
+      const round1 = generateAmericanoRounds(playerIds, 1, courts)[0];
+      await startGame(currentEvent.id, pointsPerMatch, totalRounds);
+      await generateRound(currentEvent.id, 1, round1);
+    } else {
+      allRounds = generateAmericanoRounds(playerIds, totalRounds, courts);
+      // Save game settings — this also sets game_status = 'active'
+      await startGame(currentEvent.id, pointsPerMatch, totalRounds);
+      // Only generate round 1 — subsequent rounds generated on demand
+      await generateRound(currentEvent.id, 1, allRounds[0]);
+    }
 
     startStatus.textContent = "Game started!";
 
@@ -244,15 +257,19 @@ async function renderFinalScreen(isOrganizer) {
 
   finalPanel.style.display = "block";
 
-  // Get leaderboard data
+  // Get leaderboard data + all completed matches for match history
   const scores = await getLeaderboard(currentEvent.id);
+  const allMatchesData = await getAllMatches(currentEvent.id);
   const p = playerProfiles;
 
   // If playerProfiles is empty (navigated directly), reload participants
   if (Object.keys(p).length === 0) {
     const participants = await getEventParticipants(currentEvent.id);
     participants.filter(pt => pt.status === "confirmed").forEach(pt => {
-      playerProfiles[pt.user_id] = pt.user?.display_name || pt.user?.username || "Player";
+      const name = pt.user?.display_name || pt.user?.username || "Player";
+      playerProfiles[pt.user_id] = (currentEvent.type === "couples" && pt.partner_name)
+        ? `${name} / ${pt.partner_name}`
+        : name;
     });
   }
 
@@ -270,14 +287,14 @@ async function renderFinalScreen(isOrganizer) {
       <div class="final-podium-item ${isMe ? "final-podium-me" : ""}">
         <div class="final-medal">${medals[i] || i + 1}</div>
         <div class="final-player-name">${playerProfiles[userId] || "Player"}</div>
-        <div class="final-player-pts">${data.points} pts · ${data.played} played</div>
+        <div class="final-player-pts">${data.points} pts · ${data.wins ?? 0}W ${data.ties ?? 0}T ${data.losses ?? 0}L</div>
       </div>`;
   }).join("");
 
   const fullTableHTML = sorted.length > 0 ? `
     <table class="table table-sm mt-3">
       <thead>
-        <tr><th>#</th><th>Player</th><th>Points</th><th>Played</th></tr>
+        <tr><th>#</th><th>Player</th><th>Points</th><th>W</th><th>T</th><th>L</th></tr>
       </thead>
       <tbody>
         ${sorted.map(([userId, data], i) => `
@@ -285,11 +302,62 @@ async function renderFinalScreen(isOrganizer) {
             <td>${i + 1}</td>
             <td>${playerProfiles[userId] || "Player"}</td>
             <td><strong>${data.points}</strong></td>
-            <td>${data.played}</td>
+            <td>${data.wins ?? 0}</td>
+            <td>${data.ties ?? 0}</td>
+            <td>${data.losses ?? 0}</td>
           </tr>
         `).join("")}
       </tbody>
     </table>` : `<p class="text-muted">No scores recorded.</p>`;
+
+  // ── Match History section ──────────────────────────────────────────────────
+  const matchHistoryHTML = (() => {
+    if (allMatchesData.length === 0) return "";
+    const byRound = {};
+    for (const m of allMatchesData) {
+      if (!byRound[m.round_number]) byRound[m.round_number] = [];
+      byRound[m.round_number].push(m);
+    }
+    const roundBlocks = Object.keys(byRound).sort((a, b) => a - b).map(rn => {
+      const matchRows = byRound[rn].map(m => {
+        const a1 = playerProfiles[m.team_a_p1] || "?";
+        const a2 = playerProfiles[m.team_a_p2] || "?";
+        const b1 = playerProfiles[m.team_b_p1] || "?";
+        const b2 = playerProfiles[m.team_b_p2] || "?";
+        const teamA = a2 && a2 !== "?" ? `${a1} & ${a2}` : a1;
+        const teamB = b2 && b2 !== "?" ? `${b1} & ${b2}` : b1;
+        return `
+          <div class="d-flex align-items-center justify-content-between py-1 border-bottom" style="font-size:0.82rem;">
+            <span class="text-end" style="flex:1">${teamA}</span>
+            <span class="mx-2 fw-bold">${m.score_a} — ${m.score_b}</span>
+            <span style="flex:1">${teamB}</span>
+          </div>`;
+      }).join("");
+      return `<div class="mb-2"><div class="text-muted small fw-semibold mb-1">Round ${rn}</div>${matchRows}</div>`;
+    }).join("");
+    return `
+      <div class="event-divider my-3"></div>
+      <details class="final-match-history">
+        <summary class="fw-semibold mb-2" style="cursor:pointer;">🎾 Match History</summary>
+        <div class="mt-2">${roundBlocks}</div>
+      </details>`;
+  })();
+
+  // ── CSV export helper ──────────────────────────────────────────────────────
+  const csvRows = [
+    ["Rank", "Player", "Points", "W", "T", "L"],
+    ...sorted.map(([userId, data], i) => [
+      i + 1,
+      `"${(playerProfiles[userId] || "Player").replace(/"/g, '""')}"`,
+      data.points,
+      data.wins ?? 0,
+      data.ties ?? 0,
+      data.losses ?? 0,
+    ])
+  ].map(r => r.join(",")).join("\n");
+  const csvBlob = new Blob([csvRows], { type: "text/csv" });
+  const csvUrl  = URL.createObjectURL(csvBlob);
+  const csvName = `${(currentEvent.description || "event").replace(/\s+/g, "_")}_results.csv`;
 
   const closedBadge = currentEvent.is_closed
     ? `<span class="badge bg-secondary ms-2">Closed</span>`
@@ -318,11 +386,14 @@ async function renderFinalScreen(isOrganizer) {
       <h6 class="fw-semibold mb-0">Full Leaderboard</h6>
       ${fullTableHTML}
 
+      ${matchHistoryHTML}
+
       <div class="event-divider my-3"></div>
 
       <div class="d-flex gap-2 flex-wrap">
         <a href="/event.html" class="btn btn-ghost btn-sm">← Back to Events</a>
         <a href="/court.html" class="btn btn-sun btn-sm">New Game</a>
+        ${sorted.length > 0 ? `<a href="${csvUrl}" download="${csvName}" class="btn btn-ghost btn-sm">⬇ CSV</a>` : ""}
       </div>
     </div>
   `;
@@ -336,6 +407,9 @@ async function loadRound() {
   currentRoundIndex = round.round_number;
   roundLabel.textContent = `Round ${round.round_number}`;
   roundSub.textContent   = `of ${currentEvent.total_rounds}`;
+  if (currentEvent.game_format === "mexicano") {
+    roundSub.innerHTML = `of ${currentEvent.total_rounds} &nbsp;<span class="badge bg-primary-subtle text-primary-emphasis" style="font-size:0.7rem;">Mexicano</span>`;
+  }
 
   const matches = await getMatches(currentEvent.id, round.round_number);
   const isOrganizer = currentEvent.created_by === currentUser.id;
@@ -463,7 +537,22 @@ nextRoundBtn.addEventListener("click", async () => {
 
   try {
     const nextIndex = currentRoundIndex + 1;
-    if (allRounds[nextIndex - 1]) {
+    const isMexicano = currentEvent.game_format === "mexicano";
+
+    if (isMexicano) {
+      // Mexicano: generate next round based on live standings
+      const scores = await getLeaderboard(currentEvent.id);
+      const courts = Math.max(1, Math.floor(Object.keys(playerProfiles).length / 4));
+      const sortedIds = Object.entries(scores)
+        .sort((a, b) => b[1].points - a[1].points)
+        .map(([uid]) => uid);
+      // Include any players not yet on the board (0 pts) at the end
+      const allIds = Object.keys(playerProfiles);
+      const unranked = allIds.filter(id => !sortedIds.includes(id));
+      const rankedAll = [...sortedIds, ...unranked];
+      const nextRoundFixture = generateMexicanoNextRound(rankedAll, courts);
+      await generateRound(currentEvent.id, nextIndex, nextRoundFixture);
+    } else if (allRounds[nextIndex - 1]) {
       await generateRound(currentEvent.id, nextIndex, allRounds[nextIndex - 1]);
     }
     currentRoundIndex = nextIndex;
@@ -492,7 +581,7 @@ async function renderLeaderboard() {
   leaderboard.innerHTML = `
     <table class="table table-sm">
       <thead>
-        <tr><th>#</th><th>Player</th><th>Points</th><th>Played</th></tr>
+        <tr><th>#</th><th>Player</th><th>Pts</th><th>W</th><th>T</th><th>L</th></tr>
       </thead>
       <tbody>
         ${sorted.map(([userId, data], i) => `
@@ -500,7 +589,9 @@ async function renderLeaderboard() {
             <td>${i + 1}</td>
             <td>${p[userId] || "Player"}</td>
             <td><strong>${data.points}</strong></td>
-            <td>${data.played}</td>
+            <td>${data.wins ?? 0}</td>
+            <td>${data.ties ?? 0}</td>
+            <td>${data.losses ?? 0}</td>
           </tr>
         `).join("")}
       </tbody>
