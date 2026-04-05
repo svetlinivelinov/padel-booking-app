@@ -17,6 +17,29 @@ drop policy if exists "events_insert" on public.events;
 drop policy if exists "participants_select" on public.event_participants;
 drop policy if exists "participants_insert" on public.event_participants;
 
+-- Drop hardened policies too, so reruns are safe.
+drop policy if exists "profiles_select_authenticated" on public.user_profiles;
+drop policy if exists "profiles_insert_self" on public.user_profiles;
+drop policy if exists "profiles_update_self" on public.user_profiles;
+
+drop policy if exists "groups_select_member_or_owner" on public.groups;
+drop policy if exists "groups_insert_owner" on public.groups;
+drop policy if exists "groups_update_owner" on public.groups;
+drop policy if exists "groups_delete_owner" on public.groups;
+
+drop policy if exists "group_members_select_related" on public.group_members;
+drop policy if exists "group_members_insert_owner_or_self" on public.group_members;
+drop policy if exists "group_members_delete_owner_or_self" on public.group_members;
+
+drop policy if exists "events_select_group_member" on public.events;
+drop policy if exists "events_insert_creator" on public.events;
+drop policy if exists "events_update_creator" on public.events;
+drop policy if exists "events_delete_creator" on public.events;
+
+drop policy if exists "participants_select_group_member" on public.event_participants;
+drop policy if exists "participants_insert_self" on public.event_participants;
+drop policy if exists "participants_delete_self_or_event_creator" on public.event_participants;
+
 -- Profiles: any authenticated user can read basic profile info for event/group UX;
 -- only owners can insert/update their own row.
 create policy "profiles_select_authenticated" on public.user_profiles

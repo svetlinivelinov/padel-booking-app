@@ -4,6 +4,8 @@
 -- Replace policies that can recurse through cross-table RLS checks.
 drop policy if exists "groups_select_member_or_owner" on public.groups;
 drop policy if exists "group_members_select_related" on public.group_members;
+drop policy if exists "groups_select_authenticated" on public.groups;
+drop policy if exists "group_members_select_self_or_owner" on public.group_members;
 
 -- Keep groups readable to authenticated users to avoid policy cycles during embeds.
 -- Membership control remains enforced by group_members/event policies.

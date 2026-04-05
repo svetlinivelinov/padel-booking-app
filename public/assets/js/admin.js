@@ -9,6 +9,11 @@ const {
   updateGroup,
   removeGroupMember,
   finalizeEvent,
+  adminListGroups,
+  adminListGroupMembers,
+  adminListGroupEvents,
+  adminListEventParticipants,
+  adminListUsers,
 } = db;
 
 const deleteEvent = db.deleteEvent;
@@ -35,10 +40,17 @@ const membersEmpty = document.querySelector("#admin-members-empty");
 const eventsBody = document.querySelector("#admin-events-body");
 const eventsEmpty = document.querySelector("#admin-events-empty");
 
+const usersSection = document.querySelector("#admin-users-section");
+const usersBody = document.querySelector("#admin-users-body");
+const usersEmpty = document.querySelector("#admin-users-empty");
+
 let currentUser = null;
 let currentRole = "player";
-let ownedGroups = [];
+let visibleGroups = [];
 let selectedGroup = null;
+let loadedUsers = [];
+
+const isAdmin = () => currentRole === "admin";
 
 const escapeHtml = (value) =>
   String(value ?? "")
@@ -74,7 +86,7 @@ function formatDate(dateStr) {
       hour12: true,
     });
   } catch {
-    return dateStr;
+    return String(dateStr || "-");
   }
 }
 
@@ -94,26 +106,60 @@ function renderGroupSelect() {
   if (!groupSelect) return;
 
   groupSelect.innerHTML = "";
-  if (ownedGroups.length === 0) {
-    groupSelect.innerHTML = '<option value="">No owned groups</option>';
+  if (visibleGroups.length === 0) {
+    groupSelect.innerHTML = '<option value="">No groups available</option>';
     groupSelect.disabled = true;
     return;
   }
 
   groupSelect.disabled = false;
-  ownedGroups.forEach((group) => {
+  visibleGroups.forEach((group) => {
     const option = document.createElement("option");
     option.value = group.id;
     option.textContent = group.name;
     groupSelect.appendChild(option);
   });
 
-  groupSelect.value = selectedGroup?.id || ownedGroups[0].id;
+  groupSelect.value = selectedGroup?.id || visibleGroups[0].id;
+}
+
+function renderUsers(users) {
+  if (!usersSection) return;
+
+  if (!isAdmin()) {
+    usersSection.style.display = "none";
+    return;
+  }
+
+  usersSection.style.display = "block";
+  usersBody.innerHTML = "";
+
+  if (!users || users.length === 0) {
+    usersEmpty.style.display = "block";
+    return;
+  }
+
+  usersEmpty.style.display = "none";
+
+  usersBody.innerHTML = users
+    .map((user) => {
+      const name = user.display_name || user.username || "User";
+      return `
+        <tr>
+          <td>${escapeHtml(name)}</td>
+          <td>${escapeHtml(user.username || "-")}</td>
+          <td>${escapeHtml(user.email || "-")}</td>
+          <td><span class="badge-role">${escapeHtml(user.role || "player")}</span></td>
+          <td>${escapeHtml(formatDate(user.created_at))}</td>
+        </tr>
+      `;
+    })
+    .join("");
 }
 
 async function loadSummaryAndTables() {
   if (!selectedGroup) {
-    kpiOwnedGroups.textContent = String(ownedGroups.length);
+    kpiOwnedGroups.textContent = String(visibleGroups.length);
     kpiGroupEvents.textContent = "0";
     kpiConfirmedPlayers.textContent = "0";
     kpiWaitlistedPlayers.textContent = "0";
@@ -126,13 +172,15 @@ async function loadSummaryAndTables() {
   }
 
   const [members, events] = await Promise.all([
-    listGroupMembers(selectedGroup.id),
-    listGroupEvents(selectedGroup.id),
+    isAdmin() ? adminListGroupMembers(selectedGroup.id) : listGroupMembers(selectedGroup.id),
+    isAdmin() ? adminListGroupEvents(selectedGroup.id) : listGroupEvents(selectedGroup.id),
   ]);
 
   const participantsByEvent = await Promise.all(
     events.map(async (event) => {
-      const participants = await getEventParticipants(event.id);
+      const participants = isAdmin()
+        ? await adminListEventParticipants(event.id)
+        : await getEventParticipants(event.id);
       return { eventId: event.id, participants };
     })
   );
@@ -150,7 +198,7 @@ async function loadSummaryAndTables() {
     });
   });
 
-  kpiOwnedGroups.textContent = String(ownedGroups.length);
+  kpiOwnedGroups.textContent = String(visibleGroups.length);
   kpiGroupEvents.textContent = String(events.length);
   kpiConfirmedPlayers.textContent = String(confirmedCount);
   kpiWaitlistedPlayers.textContent = String(waitlistedCount);
@@ -305,7 +353,7 @@ function renderEvents(events, participantsMap) {
 }
 
 async function onGroupChange(groupId) {
-  selectedGroup = ownedGroups.find((g) => g.id === groupId) || null;
+  selectedGroup = visibleGroups.find((g) => g.id === groupId) || null;
 
   if (!selectedGroup) {
     groupNameInput.value = "";
@@ -332,8 +380,8 @@ async function init() {
   }
 
   if (roleHint) {
-    if (currentRole === "admin") {
-      roleHint.textContent = "Admin role detected. Event actions follow your current database policies.";
+    if (isAdmin()) {
+      roleHint.textContent = "Admin mode enabled. Showing all groups, users, and events.";
     } else if (currentRole === "organizer") {
       roleHint.textContent = "Organizer mode: you can moderate your own groups.";
     } else {
@@ -341,14 +389,23 @@ async function init() {
     }
   }
 
-  ownedGroups = await listOwnedGroups(currentUser.id);
-  selectedGroup = ownedGroups[0] || null;
+  visibleGroups = isAdmin()
+    ? await adminListGroups()
+    : await listOwnedGroups(currentUser.id);
+  selectedGroup = visibleGroups[0] || null;
+
+  if (isAdmin()) {
+    loadedUsers = await adminListUsers();
+    renderUsers(loadedUsers);
+  } else {
+    renderUsers([]);
+  }
 
   renderGroupSelect();
   await onGroupChange(selectedGroup?.id || "");
 
-  if (ownedGroups.length === 0) {
-    setStatus("No groups owned yet. Create one from the Events page.");
+  if (visibleGroups.length === 0) {
+    setStatus(isAdmin() ? "No groups found in database." : "No groups owned yet. Create one from the Events page.");
   } else {
     setStatus("Admin panel ready.", "success");
   }
@@ -371,7 +428,7 @@ groupForm?.addEventListener("submit", async (event) => {
       description: groupDescriptionInput.value.trim() || null,
     });
 
-    ownedGroups = ownedGroups.map((group) =>
+    visibleGroups = visibleGroups.map((group) =>
       group.id === updated.id ? { ...group, ...updated } : group
     );
     selectedGroup = { ...selectedGroup, ...updated };
@@ -402,8 +459,8 @@ deleteGroupBtn?.addEventListener("click", async () => {
   try {
     await deleteGroup(selectedGroup.id);
 
-    ownedGroups = ownedGroups.filter((group) => group.id !== selectedGroup.id);
-    selectedGroup = ownedGroups[0] || null;
+    visibleGroups = visibleGroups.filter((group) => group.id !== selectedGroup.id);
+    selectedGroup = visibleGroups[0] || null;
     renderGroupSelect();
     await onGroupChange(selectedGroup?.id || "");
 

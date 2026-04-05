@@ -76,7 +76,7 @@
               <h2 class="section-title">Group Settings</h2>
               <form id="admin-group-form" class="mt-3">
                 <div class="mb-3">
-                  <label class="form-label" for="admin-group-select">Select owned group</label>
+                  <label class="form-label" for="admin-group-select">Select group</label>
                   <select id="admin-group-select" class="form-select"></select>
                 </div>
                 <div class="mb-3">
@@ -143,6 +143,30 @@
                 <div class="empty-state-title">No events in this group</div>
               </div>
             </div>
+
+            <div class="hero-card mt-4" id="admin-users-section">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h2 class="section-title mb-0">Users</h2>
+                <span class="text-muted small">Global user directory</span>
+              </div>
+              <div class="table-responsive admin-table-wrap">
+                <table class="table table-sm admin-table mb-0">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Username</th>
+                      <th>Email</th>
+                      <th>Role</th>
+                      <th>Created</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-users-body"></tbody>
+                </table>
+              </div>
+              <div id="admin-users-empty" class="empty-state py-4">
+                <div class="empty-state-title">No users found</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -150,7 +174,7 @@
   </main>
 
   <script src="/assets/js/env.js"></script>
-  <script type="module" src="/assets/js/admin.js?v=20260405"></script>
+  <script type="module" src="/assets/js/admin.js?v=20260406"></script>
 </body>
 </html>
 

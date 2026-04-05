@@ -437,6 +437,57 @@ export async function deleteEvent(eventId) {
   if (error) throw error;
 }
 
+export async function adminListGroups() {
+  const { data, error } = await supabase.rpc("admin_list_groups");
+  if (error) throw error;
+  return data || [];
+}
+
+export async function adminListGroupMembers(groupId) {
+  const { data, error } = await supabase.rpc("admin_list_group_members", {
+    p_group_id: groupId,
+  });
+  if (error) throw error;
+
+  return (data || []).map((m) => ({
+    ...m,
+    user: {
+      display_name: m.display_name,
+      username: m.username,
+      email: m.email,
+    },
+  }));
+}
+
+export async function adminListGroupEvents(groupId) {
+  const { data, error } = await supabase.rpc("admin_list_group_events", {
+    p_group_id: groupId,
+  });
+  if (error) throw error;
+  return data || [];
+}
+
+export async function adminListEventParticipants(eventId) {
+  const { data, error } = await supabase.rpc("admin_list_event_participants", {
+    p_event_id: eventId,
+  });
+  if (error) throw error;
+
+  return (data || []).map((p) => ({
+    ...p,
+    user: {
+      display_name: p.display_name,
+      username: p.username,
+    },
+  }));
+}
+
+export async function adminListUsers() {
+  const { data, error } = await supabase.rpc("admin_list_users");
+  if (error) throw error;
+  return data || [];
+}
+
 export async function getEvent(eventId) {
   const { data, error } = await supabase
     .from("events")

@@ -41,6 +41,10 @@ create table if not exists public.matches (
 -- ── 4. RLS for rounds ─────────────────────────────────────────────────────────
 alter table public.rounds enable row level security;
 
+drop policy if exists "rounds_select_group_member" on public.rounds;
+drop policy if exists "rounds_insert_event_creator" on public.rounds;
+drop policy if exists "rounds_update_event_creator" on public.rounds;
+
 create policy "rounds_select_group_member" on public.rounds
   for select using (
     exists (
@@ -68,6 +72,10 @@ create policy "rounds_update_event_creator" on public.rounds
 
 -- ── 5. RLS for matches ────────────────────────────────────────────────────────
 alter table public.matches enable row level security;
+
+drop policy if exists "matches_select_group_member" on public.matches;
+drop policy if exists "matches_insert_event_creator" on public.matches;
+drop policy if exists "matches_update_event_creator" on public.matches;
 
 create policy "matches_select_group_member" on public.matches
   for select using (
